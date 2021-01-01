@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"follow_symlinks": true,
+			"path": ".",
+			"folder_exclude_patterns": ["compiled","public",".*", "ci", "dist", "node_modules", "bower_components", "client/bower_components"],
+			"file_exclude_patterns": ["*.sublime-workspace"]
+		}
+	],
+	"settings": {
+		"tab_size": 2,
+		"translate_tabs_to_spaces": true
+	}
+}
