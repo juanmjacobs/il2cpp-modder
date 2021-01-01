@@ -42,10 +42,12 @@ module.exports = {
 		exeName: "A Nice Game.exe"
 	},
 	"output": "path/to/output/dir" //optional, default "output"
-	"dump": "path/to/dump.cs",
+	"dump": { 
+		path: "path/to/dump.cs"
+	},
 	"hooks": {
 		methods: [{ //Change some game functionality!
-			class: "ClassToMod",
+			className: "ClassToMod",
 			name: "MethodToMod",
 			mods: [{ //See Mod Types
 				type: "aModType", 
@@ -54,7 +56,8 @@ module.exports = {
 		}],
 		"paths": [{ //Use this paths for memory hacking!
 			name: "A descriptive name for the path", //Ex "Player speed"
-			entry: "path.to.savedPointer"
+			entry: "path.to.savedPointer",
+			path: "MyPhysics.Speed"
 		}]
 	},
 }
