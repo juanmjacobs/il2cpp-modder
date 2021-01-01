@@ -1,9 +1,10 @@
 const fs = require("fs");
 const Promise = require("bluebird");
 const _ = require("lodash");
-const DumpLoader = require("./src/domain/dumpReader");
+const DumpReader = require("./src/domain/dumpReader");
 const ProjectGenerators = require("./src/domain/projectGenerators");
 
+Promise.promisifyAll(fs);
 const rulesPath = process.argv[2];
 const rules = require(rulesPath);
 
