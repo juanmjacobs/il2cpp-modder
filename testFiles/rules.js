@@ -1,7 +1,7 @@
 module.exports = {
   "game": {
     path: "path/to/game",
-    exeName: "Among Us.exe"
+    exeName: "Among Us"
   },
   //"output": "path/to/output/dir" //optional, default "output"
   "dump": { 
@@ -12,7 +12,7 @@ module.exports = {
       className: "FFGALNAPKCD",
       name: "GetTruePosition",
       mods: [{ //See Mod Types
-        type: "savePointerParameters", 
+        type: "savePointerParameters",
       }]
     }, { 
       className: "MLPJGKEACMM",
@@ -26,7 +26,8 @@ module.exports = {
       name: "Player speed",
       entryPointer: "FFGALNAPKCD.GetTruePosition.pointer1",
       entryClass: "FFGALNAPKCD",
-      path: "MyPhysics.Speed"
+      path: "MyPhysics.Speed",
+      //mode: "automatic: 90" TODO: while(true) speed = 90
     }]
   },
 }

@@ -1,4 +1,5 @@
-#include <iostream>
+module.exports = (rules) => {
+    return `#include <iostream>
 #include <Windows.h>
 #include <TlHelp32.h>
 
@@ -63,4 +64,5 @@ int main()
         CloseHandle(hProc);
     }
     return 0;
+}`
 }
