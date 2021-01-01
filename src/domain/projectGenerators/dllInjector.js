@@ -5,8 +5,8 @@ module.exports = class DllInjector extends ProjectGenerator {
   constructor(rules) {
     super(rules)
   }  
-  generate(rules) {
-    const consoleSource = consoleTemplate(rules);
-    this.writeFile("injector/injector.cpp", consoleSource);
+  generate(metadata) {
+    const consoleSource = consoleTemplate(this.rules, metadata);
+    this.writeFile("injector", "injector.cpp", consoleSource);
   }
 }

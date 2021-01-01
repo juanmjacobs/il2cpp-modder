@@ -1,5 +1,4 @@
-module.exports = (rules, metadata) => {
-    return `#include <iostream>
+#include <iostream>
 #include <Windows.h>
 #include <TlHelp32.h>
 
@@ -32,12 +31,13 @@ DWORD GetProcId(const char* procName)
 int main()
 {
     const char* dllPath = "gameModder.dll";
-    const char* procName = "${rules.game.exeName.toLowerCase().replace(".exe","")}.exe";
+    const char* procName = "among us.exe";
     DWORD procId = 0;
 
     while (!procId)
     {
-        printf("Process not found yet\n");
+        printf("Process not found yet
+");
         procId = GetProcId(procName);
         Sleep(1000);
     }
@@ -63,5 +63,4 @@ int main()
         CloseHandle(hProc);
     }
     return 0;
-}`
 }
