@@ -37,7 +37,7 @@ int main()
 
     while (!procId)
     {
-        printf("Process not found yet\n");
+        printf("Process not found yet\\n");
         procId = GetProcId(procName);
         Sleep(1000);
     }
