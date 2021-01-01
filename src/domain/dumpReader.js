@@ -11,11 +11,11 @@ module.exports = class DumpReader {
   constructor(it) {
     _.assign(this, it);
     this.dumpLines = this.dump.split("\n");
-    this.methodHook = this.methodHook.bind(this);
-    this.pathHook = this.pathHook.bind(this);
+    this.methodInfo = this.methodInfo.bind(this);
+    this.pathInfo = this.pathInfo.bind(this);
   }
 
-  methodHook({ className, name, mods }) {
+  methodInfo({ className, name, mods }) {
     const classIndex = this._findClassIndex(className);
     const { index, line, classLines } = this._findMethodInClass(className, name);
     const relativeRvaIndex = index - 1;
@@ -24,7 +24,7 @@ module.exports = class DumpReader {
     return { className, name, mods, rva, classIndex, relativeRvaIndex };
   }
 
-  pathHook({ name, entry, path }) {
+  pathInfo({ name, entry, path }) {
     const properties = path.split(".");
     const offsets = properties.map(property => this._propertyOffset({name, entry, path}, property));
     return { name, entry, path, offsets };
