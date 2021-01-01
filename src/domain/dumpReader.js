@@ -27,20 +27,23 @@ module.exports = class DumpReader {
 
   pathInfo(options) {
     const { entryClass, path } = options;
-    const fields = path.split(".").map((field, i) => {
-      const className = i == 0 ? entryClass : entryClass; //??
+    const fieldNames = path.split(".");
+    const fields = [];
+    fieldNames.forEach((field, i) => { //TODO: To reduce?
+      const className = i == 0 ? entryClass : fields[i - 1].type; 
       const fieldInfo = this._fieldInfo(className, field); 
-      return fieldInfo;
+      fields.push(fieldInfo);
     });
     return { ...options, fields };
   }
 
   _fieldInfo(className, field) {
+    console.log(`Searching field ${field} of class ${className}`);
     const classIndex = this._findClassIndex(className);
     const { index, line } = this._findFieldInClass(className, field);
     console.log(`Found field ${field} of class ${className}: ${line} in line ${classIndex + index + 1}`)
     const offset = line.split("//")[1].trim();
-    const type = _.last(line.split(field)[0].split(" ")).trim();
+    const type = _(line.split(field)[0].split(" ")).compact().last().trim();
     return { className, field, type, offset };
   }
 
