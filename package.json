@@ -1,0 +1,25 @@
+{
+  "name": "il2cpp-modder",
+  "version": "1.0.0",
+  "description": "Generate CPP source for modding il2cpp games via dll injection",
+  "main": "il2cpp-modder.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juanmjacobs/il2cpp-modder.git"
+  },
+  "keywords": [
+    "il2cpp",
+    "game",
+    "unity",
+    "modding"
+  ],
+  "author": "Juan Jacobs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juanmjacobs/il2cpp-modder/issues"
+  },
+  "homepage": "https://github.com/juanmjacobs/il2cpp-modder#readme"
+}
