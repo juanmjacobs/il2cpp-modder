@@ -27,13 +27,21 @@ module.exports = class DumpReader {
 
   pathInfo(options) {
     const { entryClass, path } = options;
-    const properties = path.split(".");
-    const offsets = properties.map(property => this._propertyOffset(property));
-    return { ...options, offsets };
+    const fields = path.split(".").map((field, i) => {
+      const className = i == 0 ? entryClass : entryClass; //??
+      const fieldInfo = this._fieldInfo(className, field); 
+      return fieldInfo;
+    });
+    return { ...options, fields };
   }
 
-  _propertyOffset() {
-    return {} //TODO
+  _fieldInfo(className, field) {
+    const classIndex = this._findClassIndex(className);
+    const { index, line } = this._findFieldInClass(className, field);
+    console.log(`Found field ${field} of class ${className}: ${line} in line ${classIndex + index + 1}`)
+    const offset = line.split("//")[1].trim();
+    const type = _.last(line.split(field)[0].split(" ")).trim();
+    return { className, field, type, offset };
   }
 
   _findClassIndex(className) {

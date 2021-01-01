@@ -24,7 +24,8 @@ module.exports = {
     }],
     "paths": [{ 
       name: "Player speed",
-      entry: "FFGALNAPKCD.GetTruePosition.pointer1",
+      entryPointer: "FFGALNAPKCD.GetTruePosition.pointer1",
+      entryClass: "FFGALNAPKCD",
       path: "MyPhysics.Speed"
     }]
   },
