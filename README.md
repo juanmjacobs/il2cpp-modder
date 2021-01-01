@@ -56,7 +56,8 @@ module.exports = {
 		}],
 		"paths": [{ //Use this paths for memory hacking!
 			name: "A descriptive name for the path", //Ex "Player speed"
-			entry: "path.to.savedPointer",
+			entryPath: "path.to.savedPointer",
+			entryClass: "InitialClass", //Class starting the chain
 			path: "MyPhysics.Speed"
 		}]
 	},
