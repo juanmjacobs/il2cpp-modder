@@ -6,6 +6,7 @@ module.exports = class DumpReader {
   static load({ dump }) {
     return fs.readFileAsync(dump.path)
     .then(dumpFile => dumpFile.toString("utf-8"))
+    .tap(a => console.log('LLEGOOOO', a))
     .then(dump => new DumpReader({ dump }));
   }
   constructor(it) {
@@ -17,6 +18,6 @@ module.exports = class DumpReader {
   }
 
   pathHook({ name, entry }) {
-    
+
   }
 }
