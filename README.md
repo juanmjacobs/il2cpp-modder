@@ -41,6 +41,7 @@ module.exports = {
 		path: "path/to/game",
 		exeName: "A Nice Game.exe"
 	},
+	"output": "path/to/output/dir" //optional, default "output"
 	"dump": "path/to/dump.cs",
 	"hooks": {
 		methods: [{ //Change some game functionality!
