@@ -74,9 +74,9 @@ module.exports = {
  	- Description: Call original method with replaced arguments. (ex, always call setter with true, false, 0, etc)
  	- args: the replaced arguments (Array) (ex `["firstArgument", "0f", "true"]`)
 
-- savePointerParameters:
+- savePointerToThis:
   - Description: save the reference to the parameters in the [HookedData](#hooked-data) struct. Useful for memory hacks!
-  - args: No args required. (ex `SomeMethod(void* player, float amount, void* anotherPlayer, void* anotherPointer)`, will save `player`, `anotherPlayer` and `anotherPointer` to `HookedData`)
+  - args: No args required. (ex `SomeMethod(void* player, float amount)`, will save the `player` reference in `hookedData.SomeMethodThis` as an `uintptr_t`)
 
 - replaceImplementation: 
 	- Description: Just replace the whole thing
