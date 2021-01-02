@@ -1,12 +1,17 @@
 const _ = require("lodash");
 
-const savePointerToThis = ({ className, name, rva }, mod) => {
-    const hookDataProperty = `${className}_${name}_this`;
-    const definition = `//--------${name} hook------------
+const baseHook = ({ name, rva }) => {  //TODO: signature?
+    return `//--------${name} hook------------
 typedef void* (*t${name})(void* thisReference);
 uintptr_t ${name}RVA = ${rva};
 t${name} ${name} = (t${name})(assemblyAddress + ${name}RVA);
-t${name} original${name};
+t${name} original${name};`;
+}
+
+const savePointerToThis = ({ className, name, rva }, mod) => {
+    const hookDataProperty = `${className}_${name}_this`;
+    const definition =  `${baseHook({ name, rva })}
+    
 void* hacked${name}(void* thisReference)
 {
     uintptr_t ${name}This = (uintptr_t)thisReference;
