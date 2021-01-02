@@ -1,12 +1,12 @@
 const _ = require("lodash");
 
-const _toHook = ({ }) => {
-    const definition = `//--------GetTruePosition hook------------
-typedef void* (*tGetTruePosition)(void* PlayerControl);
-uintptr_t getTruePositionRVA = 0x8E6360;
-tGetTruePosition getTruePosition = (tGetTruePosition)(assemblyAddress + getTruePositionRVA);
-tGetTruePosition originalGetTruePosition;
-void* hackedGetTruePosition(void* playerControl)
+const _toHook = ({ name, rva, mods, trampolineHookBytes }) => {
+    const definition = `//--------${name} hook------------
+typedef void* (*t${name})(void* PlayerControl);
+uintptr_t ${name}RVA = ${rva};
+t${name} ${name} = (t${name})(assemblyAddress + ${name}RVA);
+t${name} original${name};
+void* hacked${name}(void* playerControl)
 {
     uintptr_t player = (uintptr_t)playerControl;
     if ((*myHookedData).player != player) 
@@ -14,10 +14,10 @@ void* hackedGetTruePosition(void* playerControl)
         printf("Reassigning player from %x to %x\\n", (*myHookedData).player, player);
         (*myHookedData).player = player;
     }
-    return originalGetTruePosition(playerControl);
+    return original${name}(playerControl);
 }`;
     
-    const invocation = `originalGetTruePosition = (tGetTruePosition)TrampolineHook(getTruePosition, hackedGetTruePosition, 6);`;
+    const invocation = `original${name} = (t${name})TrampolineHook(${name}, hacked${name}, ${trampolineHookBytes || "6"});`;
     return { definition, invocation };
 }
 const _toHooks = (rules, metadata) => {
