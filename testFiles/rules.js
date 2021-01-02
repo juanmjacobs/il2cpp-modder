@@ -11,12 +11,14 @@ module.exports = {
     methods: [{
       className: "FFGALNAPKCD",
       name: "GetTruePosition",
+      trampolineHookBytes: 6,
       mods: [{ //See Mod Types
         type: "savePointerParameters",
       }]
     }, { 
       className: "MLPJGKEACMM",
       name: "SetCoolDown",
+      trampolineHookBytes: 11,
       mods: [{ 
         type: "replaceArguments",
         args: ["0f", "0f"] 
