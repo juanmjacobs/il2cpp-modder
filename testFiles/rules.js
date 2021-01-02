@@ -13,7 +13,7 @@ module.exports = {
       name: "GetTruePosition",
       trampolineHookBytes: 6,
       mods: [{ //See Mod Types
-        type: "savePointerParameters",
+        type: "savePointerToThis",
       }]
     }, { 
       className: "MLPJGKEACMM",
