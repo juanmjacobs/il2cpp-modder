@@ -153,3 +153,4 @@ dist
 
 #Sublime
 *.sublime-workspace
+output
