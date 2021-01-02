@@ -1,7 +1,6 @@
 const _ = require("lodash");
 
-const _toHook = (options) => {
-    const { className, name, rva, mods, trampolineHookBytes } = options;
+const savePointerToThis = ({ className, name, rva }, mod) => {
     const hookDataProperty = `${className}_${name}_this`;
     const definition = `//--------${name} hook------------
 typedef void* (*t${name})(void* thisReference);
@@ -18,7 +17,26 @@ void* hacked${name}(void* thisReference)
     }
     return original${name}(thisReference);
 }`;
-    
+    return definition;
+}
+
+const replaceArguments = (options, mod) => {
+    return '//TODO IMPL REPLACE ARGUMENTS';
+}
+const fixedReturnValue = (options, mod) => {
+    return '//TODO IML fixedReturnValue';
+}
+const replaceImplementation = (options, mod) => {
+    return '//TODO IMPL replaceImplementation';
+}
+
+const MODS = { savePointerToThis, replaceArguments, fixedReturnValue, replaceImplementation }
+
+const _toHook = (options) => {
+    const { name, mods, trampolineHookBytes } = options;
+    const mod = mods[0]; //only one mod supported at the time
+    console.log("mod",mod)
+    const definition = MODS[mod.type](options, mod);
     const invocation = `original${name} = (t${name})TrampolineHook(${name}, hacked${name}, ${trampolineHookBytes || "6"});`;
     return { definition, invocation };
 }
