@@ -1,12 +1,5 @@
-module.exports = (rules, metadata) => `#include "pch.h"
-#include "models.h"
-#include "trampolineHook.h"
-#include <iostream>
-
-HookedData *myHookedData = nullptr;
-uintptr_t assemblyAddress = (uintptr_t) GetModuleHandleW(L"GameAssembly.dll");
-
-//--------GetTruePosition hook------------
+const _toHooks = (rules, metadata) => {
+    const definitions = `//--------GetTruePosition hook------------
 typedef void* (*tGetTruePosition)(void* PlayerControl);
 uintptr_t getTruePositionRVA = 0x8E6360;
 tGetTruePosition getTruePosition = (tGetTruePosition)(assemblyAddress + getTruePositionRVA);
@@ -32,13 +25,29 @@ void hackedSetCoolDown(void* killButton, float a, float b)
     printf("hacked SetCoolDown button: %x original parameters a: %f | b: %f", killButton, a, b);
     originalSetCoolDown(killButton, a, 0.0f);
 }
-
-void hookData(HookedData* hookedData) {
-    printf("received hookeddata %x - myhookeddata %x\\n", hookedData, myHookedData);
-    myHookedData = hookedData;
-    (*hookedData).assembly = assemblyAddress;
-    printf("received hookeddata %x - assigned myhookeddata %x\\n", myHookedData);
+`
+    const invocations = `
     originalGetTruePosition = (tGetTruePosition)TrampolineHook(getTruePosition, hackedGetTruePosition, 6);
     originalSetCoolDown = (tSetCoolDown)TrampolineHook(setCoolDown, hackedSetCoolDown, 11);
-}
 `
+    return { definitions, invocations };
+}
+
+module.exports = (rules, metadata) => {
+    const { definitions, invocations } = _toHooks(rules, metadata);
+    return `#include "pch.h"
+#include "models.h"
+#include "trampolineHook.h"
+#include <iostream>
+
+HookedData *myHookedData = nullptr;
+uintptr_t assemblyAddress = (uintptr_t) GetModuleHandleW(L"GameAssembly.dll");
+${definitions}
+
+void hookData(HookedData* hookedData) {
+    myHookedData = hookedData;
+    (*hookedData).assembly = assemblyAddress;
+${invocations}
+}
+`;
+}
