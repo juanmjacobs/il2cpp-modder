@@ -1,16 +1,34 @@
 const _ = require("lodash");
 
-const baseHook = ({ name, rva }) => {  //TODO: signature?
+const TYPE_MAPPINGS = {
+    boolean: "bool",
+    string: "char*",
+    object: "void*",
+    byte: "BYTE"
+}
+const startsWithUpperCase = text => text[0] == text[0].toUpperCase()
+
+const parameterType = type => {
+    const mappedType = TYPE_MAPPINGS[type];
+    if(mappedType) return mappedType;
+    if(startsWithUpperCase(type)) return "void*";
+    return type;
+}
+
+const baseHook = ({ name, rva, parameters }) => {
+    const signatureParameters = !_.isEmpty(parameters)? parameters.map(parameter => `${parameterType(parameter.type)} ${parameter.name}`) : [];
+    const signature = ["void* thisReference"].concat(signatureParameters).join(", ");
     return `//--------${name} hook------------
-typedef void* (*t${name})(void* thisReference);
+typedef void* (*t${name})(${signature});
 uintptr_t ${name}RVA = ${rva};
 t${name} ${name} = (t${name})(assemblyAddress + ${name}RVA);
 t${name} original${name};`;
 }
 
-const savePointerToThis = ({ className, name, rva }, mod) => {
+const savePointerToThis = (options, mod) => {
+    const { className, name, rva } = options;
     const hookDataProperty = `${className}_${name}_this`;
-    const definition =  `${baseHook({ name, rva })}
+    const definition =  `${baseHook(options)}
 
 void* hacked${name}(void* thisReference)
 {
