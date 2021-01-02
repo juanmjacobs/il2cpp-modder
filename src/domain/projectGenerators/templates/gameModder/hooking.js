@@ -1,4 +1,4 @@
-#include "pch.h"
+module.exports = (rules, metadata) => `#include "pch.h"
 #include "models.h"
 #include "trampolineHook.h"
 #include <iostream>
@@ -16,7 +16,7 @@ void* hackedGetTruePosition(void* playerControl)
     uintptr_t player = (uintptr_t)playerControl;
     if ((*myHookedData).player != player) 
     {
-        printf("Reassigning player from %x to %x\n", (*myHookedData).player, player);
+        printf("Reassigning player from %x to %x\\n", (*myHookedData).player, player);
         (*myHookedData).player = player;
     }
     return originalGetTruePosition(playerControl);
@@ -34,10 +34,11 @@ void hackedSetCoolDown(void* killButton, float a, float b)
 }
 
 void hookData(HookedData* hookedData) {
-    printf("received hookeddata %x - myhookeddata %x\n", hookedData, myHookedData);
+    printf("received hookeddata %x - myhookeddata %x\\n", hookedData, myHookedData);
     myHookedData = hookedData;
     (*hookedData).assembly = assemblyAddress;
-    printf("received hookeddata %x - assigned myhookeddata %x\n", myHookedData);
+    printf("received hookeddata %x - assigned myhookeddata %x\\n", myHookedData);
     originalGetTruePosition = (tGetTruePosition)TrampolineHook(getTruePosition, hackedGetTruePosition, 6);
     originalSetCoolDown = (tSetCoolDown)TrampolineHook(setCoolDown, hackedSetCoolDown, 11);
 }
+`
