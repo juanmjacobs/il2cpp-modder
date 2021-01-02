@@ -1,20 +1,22 @@
 const _ = require("lodash");
 
-const _toHook = ({ name, rva, mods, trampolineHookBytes }) => {
+const _toHook = (options) => {
+    const { className, name, rva, mods, trampolineHookBytes } = options;
+    const hookDataProperty = `${className}_${name}_this`;
     const definition = `//--------${name} hook------------
-typedef void* (*t${name})(void* PlayerControl);
+typedef void* (*t${name})(void* thisReference);
 uintptr_t ${name}RVA = ${rva};
 t${name} ${name} = (t${name})(assemblyAddress + ${name}RVA);
 t${name} original${name};
-void* hacked${name}(void* playerControl)
+void* hacked${name}(void* thisReference)
 {
-    uintptr_t player = (uintptr_t)playerControl;
-    if ((*myHookedData).player != player) 
+    uintptr_t ${name}This = (uintptr_t)thisReference;
+    if ((*myHookedData).${hookDataProperty} != thisReference) 
     {
-        printf("Reassigning player from %x to %x\\n", (*myHookedData).player, player);
-        (*myHookedData).player = player;
+        printf("Reassigning ${name}This from %x to %x\\n", (*myHookedData).${hookDataProperty}, thisReference);
+        (*myHookedData).${hookDataProperty} = thisReference;
     }
-    return original${name}(playerControl);
+    return original${name}(thisReference);
 }`;
     
     const invocation = `original${name} = (t${name})TrampolineHook(${name}, hacked${name}, ${trampolineHookBytes || "6"});`;
