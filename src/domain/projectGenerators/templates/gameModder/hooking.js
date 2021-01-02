@@ -1,5 +1,7 @@
-const _toHooks = (rules, metadata) => {
-    const definitions = `//--------GetTruePosition hook------------
+const _ = require("lodash");
+
+const _toHook = ({ }) => {
+    const definition = `//--------GetTruePosition hook------------
 typedef void* (*tGetTruePosition)(void* PlayerControl);
 uintptr_t getTruePositionRVA = 0x8E6360;
 tGetTruePosition getTruePosition = (tGetTruePosition)(assemblyAddress + getTruePositionRVA);
@@ -13,24 +15,15 @@ void* hackedGetTruePosition(void* playerControl)
         (*myHookedData).player = player;
     }
     return originalGetTruePosition(playerControl);
+}`;
+    
+    const invocation = `originalGetTruePosition = (tGetTruePosition)TrampolineHook(getTruePosition, hackedGetTruePosition, 6);`;
+    return { definition, invocation };
 }
-
-//--------SetCoolDown hook------------
-typedef void (*tSetCoolDown)(void* killButton, float a, float b);
-uintptr_t setCoolDownRVA = 0xFEF310;
-tSetCoolDown setCoolDown = (tSetCoolDown)(assemblyAddress + setCoolDownRVA);
-tSetCoolDown originalSetCoolDown;
-void hackedSetCoolDown(void* killButton, float a, float b) 
-{
-    printf("hacked SetCoolDown button: %x original parameters a: %f | b: %f", killButton, a, b);
-    originalSetCoolDown(killButton, a, 0.0f);
-}
-`
-    const invocations = `
-    originalGetTruePosition = (tGetTruePosition)TrampolineHook(getTruePosition, hackedGetTruePosition, 6);
-    originalSetCoolDown = (tSetCoolDown)TrampolineHook(setCoolDown, hackedSetCoolDown, 11);
-`
-    return { definitions, invocations };
+const _toHooks = (rules, metadata) => {
+    const hooks = metadata.methodHooks.map(_toHook);
+    const __join = property => _.map(hooks, property).join("\n");
+    return { definitions: __join("definition"), invocations: __join("invocation") };
 }
 
 module.exports = (rules, metadata) => {
