@@ -68,7 +68,7 @@ module.exports = {
 
 - fixedReturnValue: 
 	- Description: Always return a fixed value. (eg, always return true, false, 0, 9999, etc)
-	- args: the value to return (String) (ex `"true"`, `"false"`, `"0f"`)
+	- args: { type: "type", value: "value" } (ex { type: "bool", value: "true" })
 
 - replaceArguments:
  	- Description: Call original method with replaced arguments. (ex, always call setter with true, false, 0, etc)

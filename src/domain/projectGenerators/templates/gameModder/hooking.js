@@ -11,7 +11,7 @@ t${name} original${name};`;
 const savePointerToThis = ({ className, name, rva }, mod) => {
     const hookDataProperty = `${className}_${name}_this`;
     const definition =  `${baseHook({ name, rva })}
-    
+
 void* hacked${name}(void* thisReference)
 {
     uintptr_t ${name}This = (uintptr_t)thisReference;
@@ -26,13 +26,34 @@ void* hacked${name}(void* thisReference)
 }
 
 const replaceArguments = (options, mod) => {
-    return '//TODO IMPL REPLACE ARGUMENTS';
+    const { name } = options;
+    const definition =  `${baseHook(options)}
+    
+void* hacked${name}(void* thisReference)
+{
+    return original${name}(thisReference, ${mod.args.join(", ")});
+}`;
+    return definition;
 }
 const fixedReturnValue = (options, mod) => {
-    return '//TODO IML fixedReturnValue';
+    const { name } = options;
+    const definition =  `${baseHook(options)}
+    
+${mod.args.type} hacked${name}(void* thisReference)
+{
+    return ${mod.args.value};
+}`;
+    return definition;
 }
 const replaceImplementation = (options, mod) => {
-    return '//TODO IMPL replaceImplementation';
+    const { name } = options;
+    const definition =  `${baseHook(options)}
+    
+${mod.args.type} hacked${name}(void* thisReference)
+{
+    ${mod.args};
+}`;
+    return definition;
 }
 
 const MODS = { savePointerToThis, replaceArguments, fixedReturnValue, replaceImplementation }
