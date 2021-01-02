@@ -1,5 +1,5 @@
 const ProjectGenerator = require("./projectGenerator");
-const utils = require("./templates/gameModder/utils");
+const consoleTemplate = require("./templates/injector/console");
 
 module.exports = class DllInjector extends ProjectGenerator {
   constructor(rules) {

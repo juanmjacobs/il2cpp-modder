@@ -1,4 +1,4 @@
-#include "pch.h"
+module.exports = (rules, metadata) => `#include "pch.h"
 
 BYTE JMP = 0xE9;
 BYTE NOP = 0x90;
@@ -57,4 +57,4 @@ BYTE* TrampolineHook(void* sourceFunctionPointer, void* hackedFunctionPointer, u
     AddJmpToRestOfOriginalFunction(gateway, sourceFunctionPointer, trampolineBytes);
     ReplaceOriginalFunctionForHackedFunction(sourceFunctionPointer, hackedFunctionPointer, trampolineBytes);
     return gateway;
-}
+}`

@@ -1,4 +1,4 @@
-#include "pch.h"
+module.exports = (rules, metadata) => `#include "pch.h"
 #include <iostream>
 #include <strsafe.h>
 
@@ -50,3 +50,4 @@ void ErrorExit(LPTSTR lpszFunction)
 void log(std::string text) {
     MessageBox(0, s2ws(text).c_str(), L"Worker", MB_OK);
 }
+`
