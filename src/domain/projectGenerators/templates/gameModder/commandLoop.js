@@ -6,7 +6,9 @@ const _traversePath = (hook, path) => {
     const { fields } = path;
     const fieldType = `${_.last(fields).type}*`; //TODO EXTRACT LOGIC MODELSHEADER.JS
     const fieldName = hookDataPath(hook, fields); //TODO EXTRACT LOGIC MODELSHEADER.JS
-    const indirectionSentences = [`uintptr_t ${hookDataThis(hook)} = (*hookedData).${hookDataThis(hook)};`]
+    const initialPointer = hookDataThis(hook);
+    const hookedInitialPointer = `(*hookedData).${initialPointer}`;
+    const indirectionSentences = [`uintptr_t ${initialPointer} = ${hookedInitialPointer};`]
     fields.forEach(({ field, offset, type }, i) => {
         const pointerType = i == fields.length - 1? type : "uintptr_t";
         const previousVariableName = _variableName(indirectionSentences[i]);
@@ -14,8 +16,11 @@ const _traversePath = (hook, path) => {
         indirectionSentences.push(indirectionSentence);
     })
     return `
-     ${indirectionSentences.join("\n\t")}
-    (*hookedData).${fieldName} = ${_variableName(_.last(indirectionSentences))};`;
+    if(${hookedInitialPointer}) {
+        ${indirectionSentences.join("\n\t\t")}
+        (*hookedData).${fieldName} = ${_variableName(_.last(indirectionSentences))};
+    }
+    `;
 }
 
 module.exports = (rules, metadata) => {
@@ -36,7 +41,7 @@ void populateHookedPaths(HookedData* hookedData)
 void commandLoop(HookedData* hookedData)
 {
     printf("[] Assembly located at: %x\\n", (*hookedData).assembly);
-    while (!(*hookedData).player) { printf("hookedData %x - Player control not found yet\\n", hookedData); Sleep(1000); }
+    printf("Commands will not work until pointers are populated);
     
     int command = 0;
     while (true)
