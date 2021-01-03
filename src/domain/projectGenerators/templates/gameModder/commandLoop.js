@@ -80,7 +80,7 @@ const _autoValueSetter = (hook, path, i) => {
 module.exports = (rules, metadata) => {
     const hooks = pathMemoryHackHooks(metadata);
     const populateHookedPaths = _(hooks).flatMap(hook => hook.paths.map(path =>_traversePath(hook, path))).value();
-    const availableCommands = _(hooks).flatMap(hook => hook.paths.map((path, i) => _availableCommand(hook, path, i))).value();
+    const availableCommands = _(hooks).flatMap(hook => hook.paths.filter(it => !it.value).map((path, i) => _availableCommand(hook, path, i))).value();
     const commandCases = _(hooks).flatMap(hook => hook.paths.filter(it => !it.value).map((path, i) => _commandCase(hook, path, i) )).value();
     const autoValueSetterLoggers = _(hooks).flatMap(hook => hook.paths.filter(it => it.value).map((path, i) => _autoValueSetterLogger(hook, path, i) )).value();
     const autoValueSetters = _(hooks).flatMap(hook => hook.paths.filter(it => it.value).map((path, i) => _autoValueSetter(hook, path, i) )).value();
