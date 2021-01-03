@@ -9,7 +9,8 @@ const _traversePath = (hook, path) => {
     const indirectionSentences = [`uintptr_t ${hookDataThis(hook)} = (*hookedData).${hookDataThis(hook)};`]
     fields.forEach(({ field, offset, type }, i) => {
         const pointerType = i == fields.length - 1? type : "uintptr_t";
-        const indirectionSentence = `${pointerType}* ${field} = (${pointerType}*)(${i?"*":""}${_variableName(indirectionSentences[i])} + ${offset});`;
+        const previousVariableName = _variableName(indirectionSentences[i]);
+        const indirectionSentence = `${pointerType}* ${previousVariableName}_${field} = (${pointerType}*)(${i?"*":""}${previousVariableName} + ${offset});`;
         indirectionSentences.push(indirectionSentence);
     })
     return `
