@@ -27,16 +27,20 @@ const fileExistsOrPrompt = (gameName, filePath) => {
   })
 }
 
-const il2CppDumper = ({ gameAssemblyDllPath, globalMetadataDatPath }) => {
+const generateRules = gameName => { 
+  console.log("Generating rules.js!");
+}
+
+const il2CppDumper = (gameName, { gameAssemblyDllPath, globalMetadataDatPath }) => {
   console.log("Trying to execute Il2CppDumper.exe in PATH");
-  const dumperOutput = process.argv[4] || "il2cppdumper-output";
+  const dumperOutput = process.argv[4] || `${gameName.replace(/ /g, "_")}-il2cppdumper-output`;
   const execDumper =  il2CppDumperExe => {
     if(!il2CppDumperExe) { return Promise.reject("No Il2CppDumper executable supplied!"); }
     console.log("Creating output directory", dumperOutput);
-    return execAsync(`rm -rf ${dumperOutput}`).reflect()
-    .then(() => execAsync("mkdir " + dumperOutput).reflect())
+    return execAsync(`rm -rf "${dumperOutput}"`).reflect()
+    .then(() => execAsync(`mkdir "${dumperOutput}"` ).reflect())
     .then(inspection => console.log(`output directory ${dumperOutput} ${inspection.isFulfilled()? "" :" not "}created`))
-    .then(() => execAsync(`${il2CppDumperExe} "${gameAssemblyDllPath}" "${globalMetadataDatPath}" "il2cppdumper-output"`))
+    .then(() => execAsync(`${il2CppDumperExe} "${gameAssemblyDllPath}" "${globalMetadataDatPath}" "${dumperOutput}"`))
     .tap(it => console.log(`\nIl2CppDumper output: \n${it}\n`));
     
   };
@@ -54,10 +58,12 @@ const il2CppDumper = ({ gameAssemblyDllPath, globalMetadataDatPath }) => {
 module.exports = () => {
   console.log("Will try to generate dump.cs using Il2CppDumper!")
   const $gameFolder = process.argv[3] ? Promise.resolve(process.argv[3]) : promptChooseFolderDialog();
+  let gameName;
   return $gameFolder
   .tap(folder => console.log("Game located at:", folder))
+  .tap(folder => { gameName = _.last(folder.split(path.sep)) })
+  .tap(() => console.log('Game name', gameName))
   .then(folder => {
-    const gameName = _.last(folder.split(path.sep));
     const gameAssemblyDll = path.join(folder, "GameAssembly.dll"); 
     const globalMetadataDat = path.join(folder, `${gameName}_Data`, "il2cpp_data", "Metadata", "global-metadata.dat"); 
     return Promise.props({
@@ -66,5 +72,6 @@ module.exports = () => {
     })
   })
   .tap(filePaths => console.log('Will use the following paths for Il2CppDumper', filePaths))
-  .tap(il2CppDumper)
+  .tap(filePaths => il2CppDumper(gameName, filePaths))
+  .tap(() => generateRules(gameName))
 }
