@@ -5,7 +5,7 @@ module.exports = {
   },
   //"output": "path/to/output/dir" //optional, default "output"
   "dump": { 
-    path: "./testFiles/dump.cs"
+    path: __dirname + "/dump.cs",
   },
   "hooks": {
     methods: [{

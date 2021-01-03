@@ -3,7 +3,7 @@ Generate DLL injection templates for modding il2cpp games.
 
 # Usage
 
-- Get `dump.cs` from your il2cpp game via [IL2CppDumper](https://github.com/perfare/il2cppdumper)
+- Get `dump.cs` from your il2cpp game via [IL2CppDumper](https://github.com/perfare/il2cppdumper). You can also use `il2cpp-modder` to [generate the dump.cs](#generate-dump) 
 - Set up your [rules](#rules)
 - Run the template generator `node il2cpp-modder.js "./path/to/rules.js"`
 - Get your output files ready to compile with the tool of your choice! 
@@ -27,6 +27,13 @@ Generate DLL injection templates for modding il2cpp games.
 - Your methods will be automatically hooked as per your rule definitions.
 - A modding console will appear for memory hacks and monitoring. 
 - Hack away!
+
+
+# Generate dump
+You can generate the `dump.cs` of your game running
+`node il2cpp-modder generate-dump [game folder] [output directory]`
+If parameters are not supplied or not found, you will be prompted for them.
+A base `rules.js` will also be generated for you!
 
 # Rules
 You need to write a `rules.js` file telling `il2cpp-modder` what you'd like to mod! Here's an example file.
