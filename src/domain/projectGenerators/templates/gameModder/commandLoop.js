@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const { pathMemoryHackHooks, hookDataThis, hookDataPath, pathFinalType } = require("./mods/hookUtils");
+const { pathMemoryHackHooks, hookDataThis, hookDataPath, pathFinalType, cppParameterType } = require("./mods/hookUtils");
 
 const _variableName = sentence => sentence.split("=")[0].split(" ")[1].trim();
 const _pathName = ({ name, path }) => name || `${path.entryClass}.${path}`;
@@ -31,12 +31,13 @@ const _availableCommand = (hook, path, i) => `${i+1}) Change ${_pathName(path)}`
 const _commandCase = (hook, path, i) => {
     const name = _pathName(path);    
     const property = hookDataPath(hook, path.fields);
-    const type = pathFinalType(path);
-    const scanfTemplate = {
+    const type = cppParameterType(pathFinalType(path));
+    const inputType = type == "bool" ? "int" : type; 
+    const scanfFormat = {
         float: "%f",
         int: "%d",
-        string: "%s"
-    }[type] || "%d";
+        "char*": "%s"
+    }[inputType] || "%d";
 
     const hookedPointer = `populatedData.${property}`;
     const target = `*(${hookedPointer})`;
@@ -48,10 +49,10 @@ const _commandCase = (hook, path, i) => {
                         printf("${name} not hooked yet!");
                         break;
                     }
-                    printf("Your current ${name} is: %f\\n", ${target});
-                    ${type} newValue;
+                    printf("Your current ${name} is: ${scanfFormat}\\n", ${target});
+                    ${inputType} newValue;
                     printf("Enter new ${name}: ");
-                    scanf_s("${scanfTemplate}", &newValue);
+                    scanf_s("${scanfFormat}", &newValue);
                     ${target} = newValue;
                     break;
                 }`
@@ -93,28 +94,6 @@ void commandLoop(HookedData* hookedData)
             switch (command)
             {
                 ${commandCases.join("\n\t")}
-                case 1: // Change speed
-                {
-                    printf("Your current speed is: %f\\n", *(float*)populatedData.speed);
-                    int new_speed = 0;
-                    printf("Enter new speed: ");
-                    scanf_s("%d", &new_speed);
-                    *(float*)populatedData.speed = (float)new_speed;
-                    break;
-                }
-                case 2: // Toggle freeze
-                {
-                    bool isMoveable = *populatedData.moveable;
-                    auto from = isMoveable ? "moving" : "freezed";
-                    auto to = !isMoveable ? "moving" : "freezed";
-                    printf("Changing from ");
-                    printf(from);
-                    printf(" to ");
-                    printf(to);
-                    printf("\\n");
-                    *(bool*)populatedData.moveable = !(*populatedData.moveable);
-                    break;
-                }
                 default:
                     printf("Invalid command\\n");
                     break;
