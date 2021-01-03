@@ -1,36 +1,40 @@
 const _ = require("lodash");
 const { pathMemoryHackHooks, hookDataThis, hookDataPath } = require("./mods/hookUtils");
-
-const _traversePath = (hook, path) => {
-
-}
-
-module.exports = (rules, metadata) => {
-    const hooks = pathMemoryHackHooks(metadata);
-    const populateHookedPaths = _(hooks).flatMap(hook => 
-        hook.paths.map(({ fields }) => {
-            const fieldType = `${_.last(fields).type}*`;
-            const fieldName = hookDataPath(hook, fields);
-            return `${fieldType} (*hookedData).${fieldName} = nullptr;`;
-        })
-    ).value();
-    
+    // ()((*hookedData).player + physicsOffset)
     `
     uintptr_t player = (*hookedData).player;
-    printf("[] Player located at: %x\\n", player);
-
     uintptr_t* physics = (uintptr_t*)(player + 0x5c);
-    printf("[] Player Physics located at: %x\\n", physics);
     float* speed = (float*)(*physics + 0x24);
+    (*hookedData).player_myphisics_speed = speed;
+    
+    printf("[] Player located at: %x\\n", player);
+    printf("[] Player Physics located at: %x\\n", physics);
     printf("[*] Speed located at: %x \\n", speed);
 
     bool* moveable = (bool*)(player + 0x30);
     printf("[*] moveable located at: %x \\n", moveable);
     
-    playerAddresses.speed = speed;
     playerAddresses.moveable = moveable;`
 
+const _variableName = sentence => console.log("SENTENCE",sentence)||sentence.split("=")[0].split(" ")[1].trim()
+const _traversePath = (hook, path) => {
+    const { fields } = path;
+    const fieldType = `${_.last(fields).type}*`; //TODO EXTRACT LOGIC MODELSHEADER.JS
+    const fieldName = hookDataPath(hook, fields); //TODO EXTRACT LOGIC MODELSHEADER.JS
+    const indirectionSentences = [`uintptr_t ${hookDataThis(hook)} = (*hookedData).${hookDataThis(hook)};`]
+    fields.forEach(({ field, offset }, i) => {
+        const indirectionSentence = `uintptr_t* ${field} = (uintptr_t*)(${_variableName(indirectionSentences[i])} + ${offset});`;
+        indirectionSentences.push(indirectionSentence);
+    })
+    return `
+      ${indirectionSentences.join("\n\t")}
+    (*hookedData).${fieldName} = nullptr;`;
+}
 
+module.exports = (rules, metadata) => {
+    const hooks = pathMemoryHackHooks(metadata);
+    const populateHookedPaths = _(hooks).flatMap(hook => hook.paths.map(path =>_traversePath(hook, path))).value();
+    
     return `#include "pch.h"
 #include "models.h"
 #include "hooking.h"
