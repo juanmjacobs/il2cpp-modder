@@ -69,12 +69,12 @@ module.exports = {
 
 - pathMemoryHack:
   - Description: Saves the reference to the `this` and the property paths you'd like to hack in the [HookedData](#hooked-data) struct. Useful for memory hacks!
-  - args: An array of paths to memory hack!
+  - args: An array of paths to memory hack! Values can be set automatically or via the mod console. Example:
   ```
     paths: [{ 
       name: "Player speed",
       path: "MyPhysics.Speed",
-      //automatic: " 90" TODO: while(true) player.MyPhysics.speed = 90;
+      value: "90" //optional: if `value` is set, the mod will constantly write it to the path. If it is not set, a console prompt will allow you to supply a value manually.
     }]
   ```
 
