@@ -18,7 +18,7 @@ module.exports = class GameModderDll extends ProjectGenerator {
 
   generate(metadata) {
     return Promise.map([
-      { name: "dllMain.cpp", content: dllMainTemplate(this.rules, metadata) },
+      { name: "dllmain.cpp", content: dllMainTemplate(this.rules, metadata) },
       { name: "utils.cpp", content: utilsTemplate(this.rules, metadata) },
       { name: "utils.h", content: utilsHeaderTemplate(this.rules, metadata) },
       { name: "trampolineHook.cpp", content: trampolineHookTemplate(this.rules, metadata) },
