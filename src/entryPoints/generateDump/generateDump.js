@@ -75,7 +75,7 @@ const il2CppDumper = (gameName, { gameAssemblyDllPath, globalMetadataDatPath }) 
     .tap(execDumper)
   })
   .catch(e => {})
-  .thenReturn(path.join(dumperOutput, "dump.cs"))
+  .thenReturn(path.join(process.cwd(), dumperOutput, "dump.cs"))
   .finally(() => console.log(`Done! Check ${dumperOutput} for the results`));
 }
 
