@@ -43,10 +43,11 @@ const il2CppDumper = ({ gameAssemblyDllPath, globalMetadataDatPath }) => {
   return execDumper("Il2CppDumper.exe")
   .catch(e => /not recognized|no se reconoce/gi.test(e.toString()), () => {
     console.log('Il2CppDumper.exe not found in PATH! Please select your Il2CppDumper.exe');
-    return promptChooseFileDialog();
+    return promptChooseFileDialog()
+    .then(it => `"${it.trim()}"`)
+    .tap(execDumper)
+    .catch(e => {})
   })
-  .tap(execDumper)
-  .catch(e => {})
   .finally(() => console.log(`Done! Check ${dumperOutput} for the results`))
 }
 
