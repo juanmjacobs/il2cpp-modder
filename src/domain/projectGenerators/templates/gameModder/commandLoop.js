@@ -2,11 +2,22 @@ const _ = require("lodash");
 const { pathMemoryHackHooks, hookDataThis, hookDataPath } = require("./mods/hookUtils");
     // ()((*hookedData).player + physicsOffset)
     `
+
     uintptr_t player = (*hookedData).player;
+    uintptr_t FFGALNAPKCD_GetTruePosition_this = (*hookedData).FFGALNAPKCD_GetTruePosition_this;
+    
     uintptr_t* physics = (uintptr_t*)(player + 0x5c);
+    uintptr_t* MyPhysics = (uintptr_t*)(FFGALNAPKCD_GetTruePosition_this + 0x5C);
+    
     float* speed = (float*)(*physics + 0x24);
+    float* Speed = (float*)(MyPhysics + 0x24);
+    
     (*hookedData).player_myphisics_speed = speed;
     
+    (*hookedData).FFGALNAPKCD_MyPhysics_Speed = Speed;  
+
+
+
     printf("[] Player located at: %x\\n", player);
     printf("[] Player Physics located at: %x\\n", physics);
     printf("[*] Speed located at: %x \\n", speed);
@@ -16,19 +27,20 @@ const { pathMemoryHackHooks, hookDataThis, hookDataPath } = require("./mods/hook
     
     playerAddresses.moveable = moveable;`
 
-const _variableName = sentence => console.log("SENTENCE",sentence)||sentence.split("=")[0].split(" ")[1].trim()
+const _variableName = sentence => sentence.split("=")[0].split(" ")[1].trim()
 const _traversePath = (hook, path) => {
     const { fields } = path;
     const fieldType = `${_.last(fields).type}*`; //TODO EXTRACT LOGIC MODELSHEADER.JS
     const fieldName = hookDataPath(hook, fields); //TODO EXTRACT LOGIC MODELSHEADER.JS
     const indirectionSentences = [`uintptr_t ${hookDataThis(hook)} = (*hookedData).${hookDataThis(hook)};`]
-    fields.forEach(({ field, offset }, i) => {
-        const indirectionSentence = `uintptr_t* ${field} = (uintptr_t*)(${_variableName(indirectionSentences[i])} + ${offset});`;
+    fields.forEach(({ field, offset, type }, i) => {
+        const pointerType = i == fields.length - 1? type : "uintptr_t";
+        const indirectionSentence = `${pointerType}* ${field} = (${pointerType}*)(${i?"*":""}${_variableName(indirectionSentences[i])} + ${offset});`;
         indirectionSentences.push(indirectionSentence);
     })
     return `
-      ${indirectionSentences.join("\n\t")}
-    (*hookedData).${fieldName} = nullptr;`;
+     ${indirectionSentences.join("\n\t")}
+    (*hookedData).${fieldName} = ${_variableName(_.last(indirectionSentences))};`;
 }
 
 module.exports = (rules, metadata) => {
