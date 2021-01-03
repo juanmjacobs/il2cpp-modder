@@ -38,7 +38,7 @@ module.exports = class DumpReader {
   }
 
   _paths({ className, mods: [ { args: { paths }  } ] }) {
-    return paths.map(({ path }) => this._pathInfo({ entryClass: className, path }));
+    return paths.map((path) => this._pathInfo({ entryClass: className, ...path }));
   }
 
   _pathInfo(options) {

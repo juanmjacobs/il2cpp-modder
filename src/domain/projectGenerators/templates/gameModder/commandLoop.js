@@ -27,7 +27,8 @@ const _traversePath = (hook, path) => {
 module.exports = (rules, metadata) => {
     const hooks = pathMemoryHackHooks(metadata);
     const populateHookedPaths = _(hooks).flatMap(hook => hook.paths.map(path =>_traversePath(hook, path))).value();
-    
+    const availableCommands = _(hooks).flatMap(hook => hook.paths.map((path, i) => `${i+1}) Change ${path.name || path.entryClass+"."+path.path}`)).value();
+
     return `#include "pch.h"
 #include "models.h"
 #include "hooking.h"
@@ -42,13 +43,13 @@ void populateHookedPaths(HookedData* hookedData)
 void commandLoop(HookedData* hookedData)
 {
     printf("[] Assembly located at: %x\\n", (*hookedData).assembly);
-    printf("Commands will not work until pointers are populated);
+    printf("Commands will not work until pointers are populated");
     
     int command = 0;
     while (true)
     {
         command = 0;
-        printf("Available commands:\\n  1 - change speed\\n\\n  2 - toggle freeze\\n\\n");
+        printf("Available commands:\\n  ${availableCommands.join("\\n\\n  ")}");
         printf("Enter a command: ");
         cin >> command;
         populateHookedPaths(hookedData);
