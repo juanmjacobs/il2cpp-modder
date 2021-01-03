@@ -15,16 +15,20 @@ const cppParameterType = type => { //TODO: improve type mappings
     return type;
 }
 
-const buildHook = ({ name, rva, parameters, returnType }, hackedBody) => {
+const hookFunctionName = ({ className, name }) => `${className}_${name}`
+
+const buildHook = (options, hackedBody) => {
+    const { name, rva, parameters, returnType } = options;
+    const functionName = hookFunctionName(options);
     const cppReturnType = cppParameterType(returnType);
     const cppParameters = !_.isEmpty(parameters)? parameters.map(parameter => `${cppParameterType(parameter.type)} ${parameter.name}`) : [];
     const allCppParameters = ["void* thisReference"].concat(cppParameters).join(", ");
-    return `//--------${name} hook------------
-typedef ${cppReturnType} (*t${name})(${allCppParameters});
-uintptr_t ${name}RVA = ${rva};
-t${name} ${name} = (t${name})(assemblyAddress + ${name}RVA);
-t${name} original${name};
-${cppReturnType} hacked${name}(${allCppParameters}) 
+    return `//--------${functionName} hook------------
+typedef ${cppReturnType} (*t${functionName})(${allCppParameters});
+uintptr_t ${functionName}RVA = ${rva};
+t${functionName} ${functionName} = (t${functionName})(assemblyAddress + ${functionName}RVA);
+t${functionName} original_${functionName};
+${cppReturnType} hacked_${functionName}(${allCppParameters}) 
 {
     ${hackedBody()}
 }
@@ -38,4 +42,4 @@ const isPathMemoryHack = it =>_.some(it.mods, { type: "pathMemoryHack" });
 const pathMemoryHackHooks = metadata => metadata.methodHooks.filter(isPathMemoryHack);
 const pathFinalType = ({ fields }) => _.last(fields).type;
 
-module.exports = { buildHook, hookDataThis, hookDataPath, cppParameterType, isPathMemoryHack, pathMemoryHackHooks, pathFinalType };
+module.exports = { buildHook, hookDataThis, hookDataPath, cppParameterType, isPathMemoryHack, pathMemoryHackHooks, pathFinalType, hookFunctionName };

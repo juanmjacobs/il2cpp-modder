@@ -1,12 +1,14 @@
 const _ = require("lodash");
 const MODS = require("./mods");
+const { hookFunctionName } = require("./mods/hookUtils");
 
 const _toHook = (options) => {
-    const { name, mods, trampolineHookBytes } = options;
+    const { className, name, mods, trampolineHookBytes } = options;
+    const functionName = hookFunctionName(options);
     const mod = mods[0]; //only one mod supported at the time
     console.log("mod",mod)
-    const definition = MODS[mod.type](options, mod);
-    const invocation = `original${name} = (t${name})TrampolineHook(${name}, hacked${name}, ${trampolineHookBytes || "6"});`;
+    const definition = MODS[mod.type](options, mod, functionName);
+    const invocation = `original_${functionName} = (t${functionName})TrampolineHook(${functionName}, hacked_${functionName}, ${trampolineHookBytes || "6"});`;
     return { definition, invocation };
 }
 

@@ -27,7 +27,7 @@ module.exports = class DumpReader {
     const relativeRvaIndex = index - 1;
     const rva = classLines[relativeRvaIndex].split(":")[1].split(" ")[1].trim();
     const methodParts = line.split("(");
-    const returnType = methodParts[0].split(" ").map(it => it.trim())[1];
+    const returnType = methodParts[0].split(" ").map(it => it.trim()).filter(it => !_(["virtual", "override", "async"]).includes(it))[1];
     
     const parameters = methodParts[1].split(")")[0].split(",")
     .map(it => it.trim())
@@ -85,8 +85,10 @@ module.exports = class DumpReader {
       throwError(`Class ${className} not found in dump.cs`); 
     };
     try {
-      const classDefinition = this._classDefinition(className);
-      const classIndex = _.findIndex(this.dumpLines, it => _.includes(it, classDefinition));
+      const classIndex = _.findIndex(this.dumpLines, it => 
+        _([this._classDefinition(className), this._abstractClassDefinition(className)])
+        .some(definition =>  _.includes(it, definition))
+      );
       if(classIndex == -1) __notFound()
       console.log(`Found class ${className} in line ${classIndex + 1}`)
       return classIndex;
@@ -113,8 +115,7 @@ module.exports = class DumpReader {
   }
 
   _classLines(className) {
-    const classDefinition = this._classDefinition(className);
-    const classBody = this.dump.split(classDefinition)[1];
+    const classBody = this.dump.split(this._classDefinition(className))[1] || this.dump.split(this._abstractClassDefinition(className))[1];
     const lines = classBody.split("\n");
     return lines;
   }
@@ -122,4 +123,9 @@ module.exports = class DumpReader {
   _classDefinition(className) {
     return `public class ${className} `;
   }
+
+  _abstractClassDefinition(className) {
+    return `public abstract class ${className} `;
+  }
+
 }

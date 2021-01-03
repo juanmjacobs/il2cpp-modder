@@ -59,7 +59,7 @@ const _commandCase = (hook, path, i) => {
 }
 
 const _autoValueSetterLogger = (hook, path, i) => {
-    return `printf("Will keep '${_pathName(path)}' set at '${path.value}'\n");`;
+    return `printf("Will keep '${_pathName(path)}' set at '${path.value}'\\n");`;
 }
 
 const _autoValueSetter = (hook, path, i) => {

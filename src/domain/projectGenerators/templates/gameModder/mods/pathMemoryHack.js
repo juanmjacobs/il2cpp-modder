@@ -1,6 +1,6 @@
 const { buildHook, hookDataThis } = require("./hookUtils");
 
-const pathMemoryHack = (options, mod) => {
+const pathMemoryHack = (options, mod, functionName) => {
     const { className, name, rva } = options;
     const property = hookDataThis(options);
     const thisName = `${name}This`;
@@ -11,7 +11,7 @@ const pathMemoryHack = (options, mod) => {
         printf("\\n(Reassigning ${property} from %x to %x)\\n", (*myHookedData).${property}, ${thisName});
         (*myHookedData).${property} = ${thisName};
     }
-    return original${name}(thisReference);`;
+    return original_${functionName}(thisReference);`;
 
     const definition =  buildHook(options, hackedBody)
     return definition;
