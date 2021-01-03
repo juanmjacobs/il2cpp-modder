@@ -21,15 +21,19 @@ module.exports = class DumpReader {
     const { index, line, classLines } = this._findMethodInClass(className, name);
     const relativeRvaIndex = index - 1;
     const rva = classLines[relativeRvaIndex].split(":")[1].split(" ")[1].trim();
-    const parameters = line.split("(")[1].split(")")[0].split(",")
+    const methodParts = line.split("(");
+    const returnType = methodParts[0].split(" ").map(it => it.trim())[1];
+    
+    const parameters = methodParts[1].split(")")[0].split(",")
     .map(it => it.trim())
     .map(it => {
       const [ type, name ] = it.split(" ");
       return { type, name };
     })
     .filter(it => it.type && it.name);
+    
     console.log(`Found method ${line} in line ${classIndex + index + 1}. RVA: ${rva}`);
-    return { ...options, methodIndex: index, rva, classIndex, relativeRvaIndex, parameters };
+    return { ...options, methodIndex: index, rva, classIndex, relativeRvaIndex, parameters, returnType };
   }
 
   pathInfo(options) {
