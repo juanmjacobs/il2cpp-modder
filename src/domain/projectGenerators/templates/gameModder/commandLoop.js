@@ -1,31 +1,5 @@
 const _ = require("lodash");
 const { pathMemoryHackHooks, hookDataThis, hookDataPath } = require("./mods/hookUtils");
-    // ()((*hookedData).player + physicsOffset)
-    `
-
-    uintptr_t player = (*hookedData).player;
-    uintptr_t FFGALNAPKCD_GetTruePosition_this = (*hookedData).FFGALNAPKCD_GetTruePosition_this;
-    
-    uintptr_t* physics = (uintptr_t*)(player + 0x5c);
-    uintptr_t* MyPhysics = (uintptr_t*)(FFGALNAPKCD_GetTruePosition_this + 0x5C);
-    
-    float* speed = (float*)(*physics + 0x24);
-    float* Speed = (float*)(MyPhysics + 0x24);
-    
-    (*hookedData).player_myphisics_speed = speed;
-    
-    (*hookedData).FFGALNAPKCD_MyPhysics_Speed = Speed;  
-
-
-
-    printf("[] Player located at: %x\\n", player);
-    printf("[] Player Physics located at: %x\\n", physics);
-    printf("[*] Speed located at: %x \\n", speed);
-
-    bool* moveable = (bool*)(player + 0x30);
-    printf("[*] moveable located at: %x \\n", moveable);
-    
-    playerAddresses.moveable = moveable;`
 
 const _variableName = sentence => sentence.split("=")[0].split(" ")[1].trim()
 const _traversePath = (hook, path) => {
