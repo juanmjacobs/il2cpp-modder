@@ -8,7 +8,7 @@ const pathMemoryHack = (options, mod) => {
     uintptr_t ${thisName} = (uintptr_t)thisReference;
     if ((*myHookedData).${property} != ${thisName}) 
     {
-        printf("Reassigning ${property} from %x to %x\\n", (*myHookedData).${property}, ${thisName});
+        printf("\\n(Reassigning ${property} from %x to %x)\\n", (*myHookedData).${property}, ${thisName});
         (*myHookedData).${property} = ${thisName};
     }
     return original${name}(thisReference);`;

@@ -78,14 +78,14 @@ void populateHookedPaths(HookedData* hookedData)
 void commandLoop(HookedData* hookedData)
 {
     printf("[] Assembly located at: %x\\n", (*hookedData).assembly);
-    printf("Commands will not work until pointers are populated");
+    printf("\\nCommands will not work until pointers are populated!\\n\\n");
     
     int command = 0;
     while (true)
     {
         command = 0;
-        printf("Available commands:\\n  ${availableCommands.join("\\n\\n  ")}");
-        printf("Enter a command: ");
+        printf("\\nAvailable commands:\\n  ${availableCommands.join("\\n\\n  ")}\\n");
+        printf("\\n\\n\\nEnter a command: \\n");
         cin >> command;
         populateHookedPaths(hookedData);
         HookedData populatedData = *hookedData;
