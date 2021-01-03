@@ -31,6 +31,8 @@ ${cppReturnType} hacked${name}(${allCppParameters})
 `;
 }
 
-const hookDataProperty = ({ className, name }) => `${className}_${name}_this`;
+const _hookDataSuffix = ({ className }, properties) => [ className ].concat(properties).join("_");
+const hookDataThis = (options) => _hookDataSuffix(options, [options.name, "this"]);
+const hookDataPath = (options, fields) => _hookDataSuffix(options, fields.map(it => it.field));
 
-module.exports = { buildHook, hookDataProperty };
+module.exports = { buildHook, hookDataThis, hookDataPath, cppParameterType };

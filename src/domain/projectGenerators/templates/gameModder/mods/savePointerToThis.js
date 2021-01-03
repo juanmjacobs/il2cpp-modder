@@ -1,8 +1,8 @@
-const { buildHook, hookDataProperty } = require("./hookUtils");
+const { buildHook, hookDataThis } = require("./hookUtils");
 
 const savePointerToThis = (options, mod) => {
     const { className, name, rva } = options;
-    const property = hookDataProperty(options);;
+    const property = hookDataThis(options);
     const hackedBody = () => `uintptr_t ${name}This = (uintptr_t)thisReference;
     if ((*myHookedData).${property} != thisReference) 
     {
