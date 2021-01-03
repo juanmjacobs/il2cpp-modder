@@ -28,9 +28,6 @@ const _traversePath = (hook, path) => {
 
 const _availableCommand = (hook, path, i) => `${i+1}) Change ${_pathName(path)}`;
 
-const _scanfFormat = (path) => {
-
-}
 const _commandCase = (hook, path, i) => {
     const name = _pathName(path);    
     const property = hookDataPath(hook, path.fields);
