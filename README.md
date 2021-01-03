@@ -5,40 +5,35 @@ Generate DLL injection templates for modding il2cpp games.
 
 - Get `dump.cs` from your il2cpp game via [IL2CppDumper](https://github.com/perfare/il2cppdumper)
 - Set up your [rules](#rules)
-- Run the template generator `node src/index.js "./path/to/rules.js"`
-- Get your output files ready to compile with the tool of your choice! (I used visual studio)
+- Run the template generator `node il2cpp-modder.js "./path/to/rules.js"`
+- Get your output files ready to compile with the tool of your choice! 
 	- `injector.cpp`: Source for a simple c++ console app project that will inject our DLL in the game executable (`exe` in rules.js). 
 		- Always run as administrator! (properties -> Linker -> Manifest File -> UAC Execution Level -> requireAdministrator)
 		- If using vs, set string to multibyte (properties -> Advanced -> Character Set -> Use Multi-Byte Character Set)
 	- `gameModder`: Sources for a c++ DLL project with the mods you want!
-- Compile the output files to get an `injector.exe` and a `gameModder.dll`
+- Of course, you can modify the output files if you need to!
+- Compile the output files to get an `injector.exe` and a `gameModder.dll`. I used Visual Studio!
+  - For `injector.exe`
+    - Create a new C++ console project and name it `injector`.
+    - Add the `output/injector` files to the project. 
+    - Compile it and the `injector.exe` will be in the `Debug` folder.
+  - For `gameModder.dll`
+    - Create a new C++ Dynamic Linked Library project and name it `gameModder`.
+    - Add the `output/gameModder` files to the project. 
+    - Compile it and the `gameModder.dll` will be in the `Debug` folder.
+- copy the `injector.exe` and `gameModder.dll` to the game folder
 - Run the game as usual
 - Run the injector.exe
-- A modding console will appear for memory hacks and mod monitoring
+- Your methods will be automatically hooked as per your rule definitions.
+- A modding console will appear for memory hacks and monitoring. 
 - Hack away!
-
-
-# Function mods
-1) Hook the method you'd like to mod.
-2) Use some mod type to change the behaviour as per your needs. You can 
-	- fix a return value 
-	- save some pointers 
-	- replace the arguments of the original call
-	- replace the whole implementation (c++ programming required)
-
-# Memory hacks
-
-1) Hook some methods to get the pointers to the objects you'd like to mod. Those pointers get saved to [HookedData](#hooked-data)
-2) Define the paths you'd like to mod and the entry pointers (the ones you saved from your hooks in step 1!).
-3) An interactive console will be generated and you can set the values you want
-
 
 # Rules
 You need to write a `rules.js` file telling `il2cpp-modder` what you'd like to mod! Here's an example file.
 ```
 module.exports = {
 	"game": {
-		path: "path/to/game",
+		path: "path/to/game", //optional
 		exeName: "A Nice Game.exe"
 	},
 	"output": "path/to/output/dir" //optional, default "output"
@@ -62,13 +57,13 @@ module.exports = {
 
 - fixedReturnValue: 
 	- Description: Always return a fixed value. (eg, always return true, false, 0, 9999, etc)
-	- args: { type: "type", value: "value" } (ex { type: "bool", value: "true" })
+	- args: the value to return (String) (ex 'true', '0.0f', '"some string"')
 
 - replaceArguments:
  	- Description: Call original method with replaced arguments. (ex, always call setter with true, false, 0, etc)
  	- args: the replaced arguments (Array) (ex `["firstArgument", "0f", "true"]`)
 
-- replaceImplementation: 
+- replaceImplementation:
 	- Description: Just replace the whole thing
 	- args: the new c++ implementation (String) (ex `"return theOriginalParameter + 10;"`)
 
@@ -85,8 +80,9 @@ module.exports = {
 
 ## Trampoline hook bytes
 [WTF is a trampoline hook?](https://stackoverflow.com/a/9336549)
+
 A `jmp dir` instruction takes 5 bytes, 1 for the `jmp` and 4 for the `dir` (32 bits address).
-So the `trampolineHookBytes` should be setted to the amount of bytes of complete assembly instructions (opcode + operands) of your function so that there is more than 5 bytes. 
+So the `trampolineHookBytes` should be setted to the amount of bytes of complete assembly instructions (opcode + operands) of your function so that there is more than 5 bytes.
 I know, it sounds confusing! Lets see an example:
 Fire up your [Cheat Engine](https://www.cheatengine.org/downloads.php) -> attach your process -> memory view -> CTRL G -> paste the `GameAssembly.dll + RVA of the function`. Remember, the RVA of the function is on dump.cs.
 It should look something like this
@@ -110,4 +106,4 @@ So let's add up the number of bytes of each line until we have more than 5!
 ```
 
 ## HookedData
-il2cpp-modder will generate a struct name HookedData with all the saved parameter references for further modding
+il2cpp-modder will generate a struct name HookedData with all the saved references for further modding or more advanced hacks.
