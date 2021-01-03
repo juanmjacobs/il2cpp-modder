@@ -1,7 +1,9 @@
 const _ = require("lodash");
 const { pathMemoryHackHooks, hookDataThis, hookDataPath } = require("./mods/hookUtils");
 
-const _variableName = sentence => sentence.split("=")[0].split(" ")[1].trim()
+const _variableName = sentence => sentence.split("=")[0].split(" ")[1].trim();
+const _pathName = ({ name, path }) => name || `${path.entryClass}.${path}`;
+
 const _traversePath = (hook, path) => {
     const { fields } = path;
     const fieldType = `${_.last(fields).type}*`; //TODO EXTRACT LOGIC MODELSHEADER.JS
@@ -24,10 +26,29 @@ const _traversePath = (hook, path) => {
     `;
 }
 
+const _availableCommand = (hook, path, i) => `${i+1}) Change ${_pathName(path)}`;
+
+const _commandCase = (hook, path, i) => {
+    const name = _pathName(path);    
+    const property = hookDataPath(hook, path.fields);
+    const target = `*(populatedData.${property})`;
+    return `
+                case ${i + 1}: // Change ${name}
+                {
+                    printf("Your current ${name} is: %f\\n", ${target});
+                    int newValue = 0;
+                    printf("Enter new ${name}: ");
+                    scanf_s("%d", &newValue);
+                    ${target} = (float)newValue;
+                    break;
+                }`
+}
+
 module.exports = (rules, metadata) => {
     const hooks = pathMemoryHackHooks(metadata);
     const populateHookedPaths = _(hooks).flatMap(hook => hook.paths.map(path =>_traversePath(hook, path))).value();
-    const availableCommands = _(hooks).flatMap(hook => hook.paths.map((path, i) => `${i+1}) Change ${path.name || path.entryClass+"."+path.path}`)).value();
+    const availableCommands = _(hooks).flatMap(hook => hook.paths.map((path, i) => _availableCommand(hook, path, i))).value();
+    const commandCases = _(hooks).flatMap(hook => hook.paths.map((path, i) => _commandCase(hook, path, i) )).value();
 
     return `#include "pch.h"
 #include "models.h"
@@ -58,33 +79,33 @@ void commandLoop(HookedData* hookedData)
         {
             switch (command)
             {
-            case 1: // Change speed
-            {
-                printf("Your current speed is: %f\\n", *(float*)populatedData.speed);
-                int new_speed = 0;
-                printf("Enter new speed: ");
-                scanf_s("%d", &new_speed);
-                // We know from dnSpy that this variable is a float. Make it so.
-                *(float*)populatedData.speed = (float)new_speed;
-                break;
-            }
-            case 2: // Toggle freeze
-            {
-                bool isMoveable = *populatedData.moveable;
-                auto from = isMoveable ? "moving" : "freezed";
-                auto to = !isMoveable ? "moving" : "freezed";
-                printf("Changing from ");
-                printf(from);
-                printf(" to ");
-                printf(to);
-                printf("\\n");
-                *(bool*)populatedData.moveable = !(*populatedData.moveable);
-                break;
-            }
-            default:
-                printf("Invalid command\\n");
-                break;
-            }
+                ${commandCases.join("\n\t")}
+                case 1: // Change speed
+                {
+                    printf("Your current speed is: %f\\n", *(float*)populatedData.speed);
+                    int new_speed = 0;
+                    printf("Enter new speed: ");
+                    scanf_s("%d", &new_speed);
+                    *(float*)populatedData.speed = (float)new_speed;
+                    break;
+                }
+                case 2: // Toggle freeze
+                {
+                    bool isMoveable = *populatedData.moveable;
+                    auto from = isMoveable ? "moving" : "freezed";
+                    auto to = !isMoveable ? "moving" : "freezed";
+                    printf("Changing from ");
+                    printf(from);
+                    printf(" to ");
+                    printf(to);
+                    printf("\\n");
+                    *(bool*)populatedData.moveable = !(*populatedData.moveable);
+                    break;
+                }
+                default:
+                    printf("Invalid command\\n");
+                    break;
+                }
         }
     }
 
