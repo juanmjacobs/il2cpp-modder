@@ -58,29 +58,30 @@ const _commandCase = (hook, path, i) => {
                 }`
 }
 
+const _autoValueSetterLogger = (hook, path, i) => {
+    return `printf("Will keep '${_pathName(path)}' set at '${path.value}'");`;
+}
+
+const _autoValueSetter = (hook, path, i) => {
+    const name = _pathName(path);    
+    const property = hookDataPath(hook, path.fields);
+    const type = cppParameterType(pathFinalType(path));
+    const pointer = `populatedData.${property}`;
+    return `
+        if (${pointer})
+        {
+            *(${pointer}) = ${path.value};
+        }`;     
+}
+
 module.exports = (rules, metadata) => {
     const hooks = pathMemoryHackHooks(metadata);
     const populateHookedPaths = _(hooks).flatMap(hook => hook.paths.map(path =>_traversePath(hook, path))).value();
-    const availableCommands = _(hooks).flatMap(hook => hook.paths.map((path, i) => _availableCommand(hook, path, i))).value();
-    const commandCases = _(hooks).flatMap(hook => hook.paths.map((path, i) => _commandCase(hook, path, i) )).value();
-
-    return `#include "pch.h"
-#include "models.h"
-#include "hooking.h"
-#include "utils.h"
-#include <iostream>
-using namespace std;
-
-void populateHookedPaths(HookedData* hookedData) 
-{
-    ${populateHookedPaths.join("\t\n")}
-}
-void commandLoop(HookedData* hookedData)
-{
-    printf("[] Assembly located at: %x\\n", (*hookedData).assembly);
-    printf("\\nCommands will not work until pointers are populated!\\n\\n");
-    
-    int command = 0;
+    const availableCommands = _(hooks).flatMap(hook => hook.paths.filter(it => !it.value).map((path, i) => _availableCommand(hook, path, i))).value();
+    const commandCases = _(hooks).flatMap(hook => hook.paths.filter(it => !it.value).map((path, i) => _commandCase(hook, path, i) )).value();
+    const autoValueSetterLoggers = _(hooks).flatMap(hook => hook.paths.filter(it => it.value).map((path, i) => _autoValueSetterLogger(hook, path, i) )).value();
+    const autoValueSetters = _(hooks).flatMap(hook => hook.paths.filter(it => it.value).map((path, i) => _autoValueSetter(hook, path, i) )).value();
+    const inputLoop = !_.isEmpty(commandCases)? `int command = 0;
     while (true)
     {
         command = 0;
@@ -99,7 +100,39 @@ void commandLoop(HookedData* hookedData)
                     break;
                 }
         }
+    }` : "";
+
+    return `#include "pch.h"
+#include "models.h"
+#include "hooking.h"
+#include "utils.h"
+#include <iostream>
+#include <thread>
+using namespace std;
+
+void populateHookedPaths(HookedData* hookedData) 
+{
+    ${populateHookedPaths.join("\n\t")}
+}
+
+void autoSetValues(HookedData* hookedData) 
+{
+    ${autoValueSetterLoggers.join("\n\t")}
+    while (true) 
+    {
+        populateHookedPaths(hookedData);
+        HookedData populatedData = *hookedData;
+        //Constantly set values
+        ${autoValueSetters.join("\n\t")}
     }
+}
+
+void commandLoop(HookedData* hookedData)
+{
+    printf("[] Assembly located at: %x\\n", (*hookedData).assembly);
+    printf("\\nCommands will not work until pointers are populated!\\n\\n");
+    ${!_.isEmpty(autoValueSetters)? "thread autoSetValuesThread(autoSetValues, hookedData);" : ""}    
+    ${inputLoop}
 
 }
 

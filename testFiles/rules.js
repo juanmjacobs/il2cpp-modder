@@ -17,11 +17,11 @@ module.exports = {
         args: { 
           paths: [{ 
             name: "Player speed",
-            path: "MyPhysics.Speed",
+            path: "MyPhysics.Speed"
           },{ 
-            name: "Player is movable",
+            name: "Player is moveable",
             path: "moveable",
-            //automatic: "true"
+            value: "true"
           }]
         }
       }]
