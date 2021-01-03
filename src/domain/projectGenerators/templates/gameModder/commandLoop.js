@@ -1,17 +1,21 @@
-module.exports = (rules, metadata) => `#include "pch.h"
+const { pathMemoryHackHooks } = require("./mods/hookUtils");
+
+module.exports = (rules, metadata) => {
+    const hooks = pathMemoryHackHooks(metadata);
+
+    return `#include "pch.h"
 #include "models.h"
 #include "hooking.h"
 #include "utils.h"
 #include <iostream>
 using namespace std;
 
-PlayerAddresses getPlayer(HookedData* hookedData) 
+void populateHookedPaths(HookedData* hookedData) 
 {
     PlayerAddresses playerAddresses = PlayerAddresses();
     uintptr_t player = (*hookedData).player;
     printf("[] Player located at: %x\\n", player);
 
-    //log(std::string("[] Player located at ") + std::to_string((uintptr_t)myPlayerControl));
     uintptr_t* physics = (uintptr_t*)(player + 0x5c);
     printf("[] Player Physics located at: %x\\n", physics);
     float* speed = (float*)(*physics + 0x24);
@@ -37,7 +41,7 @@ void commandLoop(HookedData* hookedData)
         printf("Available commands:\\n  1 - change speed\\n\\n  2 - toggle freeze\\n\\n");
         printf("Enter a command: ");
         cin >> command;
-        PlayerAddresses player = getPlayer(hookedData);
+        populateHookedPaths(hookedData);
         if (command != 0)
         {
             switch (command)
@@ -89,3 +93,4 @@ void insertConsole()
     commandLoop(&hookedData);
 }
 `
+}

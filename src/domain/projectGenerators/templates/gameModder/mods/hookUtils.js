@@ -34,5 +34,7 @@ ${cppReturnType} hacked${name}(${allCppParameters})
 const _hookDataSuffix = ({ className }, properties) => [ className ].concat(properties).join("_");
 const hookDataThis = (options) => _hookDataSuffix(options, [options.name, "this"]);
 const hookDataPath = (options, fields) => _hookDataSuffix(options, fields.map(it => it.field));
+const isPathMemoryHack = it =>_.some(it.mods, { type: "pathMemoryHack" });
+const pathMemoryHackHooks = metadata => metadata.methodHooks.filter(isPathMemoryHack);
 
-module.exports = { buildHook, hookDataThis, hookDataPath, cppParameterType };
+module.exports = { buildHook, hookDataThis, hookDataPath, cppParameterType, isPathMemoryHack, pathMemoryHackHooks};
