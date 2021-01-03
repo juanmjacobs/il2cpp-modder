@@ -32,7 +32,7 @@ module.exports = class DumpReader {
     .filter(it => it.type && it.name);
     
     console.log(`Found method ${line} in line ${classIndex + index + 1}. RVA: ${rva}`);
-    const paths = _.some(mods, { type: "savePointerToThis" }) ? this._paths(options) : []; //TODO: EXTRACT LOGIC modelsHeader.h
+    const paths = _.some(mods, { type: "pathMemoryHack" }) ? this._paths(options) : []; //TODO: EXTRACT LOGIC modelsHeader.h
     return { ...options, methodIndex: index, rva, classIndex, relativeRvaIndex, parameters, returnType, paths };
   }
 

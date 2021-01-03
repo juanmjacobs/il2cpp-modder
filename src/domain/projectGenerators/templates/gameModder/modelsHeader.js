@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const { hookDataThis, hookDataPath } = require("./mods/hookUtils");
 
-const savePointerToThisHooks = metadata => metadata.methodHooks.filter(it => _.some(it.mods, { type: "savePointerToThis" }));
+const pathMemoryHackHooks = metadata => metadata.methodHooks.filter(it => _.some(it.mods, { type: "pathMemoryHack" }));
 
 const savedThisPointers = hooks => hooks
   .map(hookDataThis)
@@ -18,7 +18,7 @@ const savedPaths = hooks => _(hooks)
   .value()
 
 module.exports = (rules, metadata) => {
-  const hooks = savePointerToThisHooks(metadata);
+  const hooks = pathMemoryHackHooks(metadata);
 
 return `#pragma once
 #include "pch.h"

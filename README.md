@@ -72,8 +72,8 @@ module.exports = {
 	- Description: Just replace the whole thing
 	- args: the new c++ implementation (String) (ex `"return theOriginalParameter + 10;"`)
 
-- savePointerToThis:
-  - Description: save the reference to the parameters in the [HookedData](#hooked-data) struct. Useful for memory hacks!
+- pathMemoryHack:
+  - Description: Saves the reference to the `this` and the property paths you'd like to hack in the [HookedData](#hooked-data) struct. Useful for memory hacks!
   - args: An array of paths to memory hack!
   ```
     paths: [{ 

@@ -1,6 +1,6 @@
 const { buildHook, hookDataThis } = require("./hookUtils");
 
-const savePointerToThis = (options, mod) => {
+const pathMemoryHack = (options, mod) => {
     const { className, name, rva } = options;
     const property = hookDataThis(options);
     const hackedBody = () => `uintptr_t ${name}This = (uintptr_t)thisReference;
@@ -15,4 +15,4 @@ const savePointerToThis = (options, mod) => {
     return definition;
 }
 
-module.exports = savePointerToThis;
+module.exports = pathMemoryHack;

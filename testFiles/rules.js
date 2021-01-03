@@ -13,7 +13,7 @@ module.exports = {
       name: "GetTruePosition",
       trampolineHookBytes: 6,
       mods: [{ //See Mod Types
-        type: "savePointerToThis",
+        type: "pathMemoryHack",
         args: { 
           paths: [{ 
             name: "Player speed",
