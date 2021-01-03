@@ -1,18 +1,21 @@
-const { pathMemoryHackHooks } = require("./mods/hookUtils");
+const _ = require("lodash");
+const { pathMemoryHackHooks, hookDataThis, hookDataPath } = require("./mods/hookUtils");
+
+const _traversePath = (hook, path) => {
+
+}
 
 module.exports = (rules, metadata) => {
     const hooks = pathMemoryHackHooks(metadata);
-
-    return `#include "pch.h"
-#include "models.h"
-#include "hooking.h"
-#include "utils.h"
-#include <iostream>
-using namespace std;
-
-void populateHookedPaths(HookedData* hookedData) 
-{
-    PlayerAddresses playerAddresses = PlayerAddresses();
+    const populateHookedPaths = _(hooks).flatMap(hook => 
+        hook.paths.map(({ fields }) => {
+            const fieldType = `${_.last(fields).type}*`;
+            const fieldName = hookDataPath(hook, fields);
+            return `${fieldType} (*hookedData).${fieldName} = nullptr;`;
+        })
+    ).value();
+    
+    `
     uintptr_t player = (*hookedData).player;
     printf("[] Player located at: %x\\n", player);
 
@@ -25,9 +28,19 @@ void populateHookedPaths(HookedData* hookedData)
     printf("[*] moveable located at: %x \\n", moveable);
     
     playerAddresses.speed = speed;
-    playerAddresses.moveable = moveable;
+    playerAddresses.moveable = moveable;`
 
-    return playerAddresses;
+
+    return `#include "pch.h"
+#include "models.h"
+#include "hooking.h"
+#include "utils.h"
+#include <iostream>
+using namespace std;
+
+void populateHookedPaths(HookedData* hookedData) 
+{
+    ${populateHookedPaths.join("\t\n")}
 }
 void commandLoop(HookedData* hookedData)
 {
@@ -42,23 +55,24 @@ void commandLoop(HookedData* hookedData)
         printf("Enter a command: ");
         cin >> command;
         populateHookedPaths(hookedData);
+        HookedData populatedData = *hookedData;
         if (command != 0)
         {
             switch (command)
             {
             case 1: // Change speed
             {
-                printf("Your current speed is: %f\\n", *(float*)player.speed);
+                printf("Your current speed is: %f\\n", *(float*)populatedData.speed);
                 int new_speed = 0;
                 printf("Enter new speed: ");
                 scanf_s("%d", &new_speed);
                 // We know from dnSpy that this variable is a float. Make it so.
-                *(float*)player.speed = (float)new_speed;
+                *(float*)populatedData.speed = (float)new_speed;
                 break;
             }
             case 2: // Toggle freeze
             {
-                bool isMoveable = *player.moveable;
+                bool isMoveable = *populatedData.moveable;
                 auto from = isMoveable ? "moving" : "freezed";
                 auto to = !isMoveable ? "moving" : "freezed";
                 printf("Changing from ");
@@ -66,7 +80,7 @@ void commandLoop(HookedData* hookedData)
                 printf(" to ");
                 printf(to);
                 printf("\\n");
-                *(bool*)player.moveable = !(*player.moveable);
+                *(bool*)populatedData.moveable = !(*populatedData.moveable);
                 break;
             }
             default:
