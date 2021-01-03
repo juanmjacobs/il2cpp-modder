@@ -18,7 +18,10 @@ module.exports = {
           paths: [{ 
             name: "Player speed",
             path: "MyPhysics.Speed",
-            //mode: "automatic: 90" TODO: while(true) speed = 90
+          },{ 
+            name: "Player is movable",
+            path: "moveable",
+            //automatic: "true"
           }]
         }
       }]
