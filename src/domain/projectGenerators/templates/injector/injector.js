@@ -1,4 +1,5 @@
 module.exports = (rules, metadata) => {
+    const exeName = `${rules.game.exeName.toLowerCase().replace(".exe","")}.exe`;
     return `#include <iostream>
 #include <Windows.h>
 #include <TlHelp32.h>
@@ -32,12 +33,12 @@ DWORD GetProcId(const char* procName)
 int main()
 {
     const char* dllPath = "gameModder.dll";
-    const char* procName = "${rules.game.exeName.toLowerCase().replace(".exe","")}.exe";
+    const char* procName = "${exeName}";
     DWORD procId = 0;
 
     while (!procId)
     {
-        printf("Process not found yet\\n");
+        printf("Process not found yet for executable ${rules.game.exeName}\\n");
         procId = GetProcId(procName);
         Sleep(1000);
     }

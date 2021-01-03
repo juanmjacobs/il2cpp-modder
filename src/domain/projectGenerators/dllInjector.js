@@ -1,5 +1,5 @@
 const ProjectGenerator = require("./projectGenerator");
-const consoleTemplate = require("./templates/injector/console");
+const injectorTemplate = require("./templates/injector/injector");
 
 module.exports = class DllInjector extends ProjectGenerator {
   constructor(rules) {
@@ -7,8 +7,7 @@ module.exports = class DllInjector extends ProjectGenerator {
   }  
 
   generate(metadata) {
-    const consoleSource = consoleTemplate(this.rules, metadata);
-    this.writeFile("injector", "injector.cpp", consoleSource);
+    this.writeFile("injector", "injector.cpp", injectorTemplate(this.rules, metadata));
   }
 
 }
