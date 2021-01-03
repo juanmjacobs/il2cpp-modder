@@ -30,6 +30,28 @@ void* hacked${name}(${signature})
 `;
 }
 
+
+const replaceImplementation = (options, mod) => {
+    const { name } = options;
+    const hackedBody = mod.args;
+    const definition = buildHook(options, args);
+    return definition;
+}
+
+const fixedReturnValue = (options, mod) => {
+    const { name } = options;
+    const hackedBody = () => `return ${mod.args.value};`;
+    const definition =  buildHook(options, hackedBody);
+    return definition;
+}
+
+const replaceArguments = (options, mod) => {
+    const { name } = options;
+    const hackedBody = () => `return original${name}(thisReference, ${mod.args.join(", ")});`
+    const definition =  buildHook(options, hackedBody);
+    return definition;
+}
+
 const savePointerToThis = (options, mod) => {
     const { className, name, rva } = options;
     const hookDataProperty = `${className}_${name}_this`;
@@ -45,26 +67,6 @@ const savePointerToThis = (options, mod) => {
     return definition;
 }
 
-const replaceArguments = (options, mod) => {
-    const { name } = options;
-    const hackedBody = () => `return original${name}(thisReference, ${mod.args.join(", ")});`
-    const definition =  buildHook(options, hackedBody);
-    return definition;
-}
-
-const fixedReturnValue = (options, mod) => {
-    const { name } = options;
-    const hackedBody = () => `return ${mod.args.value};`;
-    const definition =  buildHook(options, hackedBody);
-    return definition;
-}
-
-const replaceImplementation = (options, mod) => {
-    const { name } = options;
-    const hackedBody = mod.args;
-    const definition = buildHook(options, args);
-    return definition;
-}
 
 const MODS = { savePointerToThis, replaceArguments, fixedReturnValue, replaceImplementation }
 
@@ -96,7 +98,7 @@ ${definitions}
 void hookData(HookedData* hookedData) {
     myHookedData = hookedData;
     (*hookedData).assembly = assemblyAddress;
-${invocations}
+    ${invocations}
 }
 `;
 }
