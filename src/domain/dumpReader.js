@@ -3,6 +3,11 @@ const _ = require("lodash");
 const Promise = require("bluebird");
 const { isPathMemoryHack } = require("./projectGenerators/templates/gameModder/mods/hookUtils");
 
+const throwError = message => {
+  console.log("\n\n", "[ERROR]", message, "\n\n");
+  throw new Error(message);
+}
+
 module.exports = class DumpReader {
   static load({ dump }) {
     return fs.readFileAsync(dump.path)
@@ -37,8 +42,20 @@ module.exports = class DumpReader {
     return { ...options, methodIndex: index, rva, classIndex, relativeRvaIndex, parameters, returnType, paths };
   }
 
-  _paths({ className, mods: [ { args: { paths }  } ] }) {
-    return paths.map((path) => this._pathInfo({ entryClass: className, ...path }));
+  _paths({ className, name, mods: [ { args: { paths }  } ] }) {
+    const validPaths = paths.map((path) => {
+      try {
+        return this._pathInfo({ entryClass: className, ...path })
+      } catch(e) {
+        return null;
+      }
+    })
+    .filter(it => it);
+
+    if(_.isEmpty(validPaths)) {
+      throwError(`No valid paths for mod ${className}.${name}`);
+    }
+    return validPaths;
   }
 
   _pathInfo(options) {
@@ -64,10 +81,18 @@ module.exports = class DumpReader {
   }
 
   _findClassIndex(className) {
-    const classDefinition = this._classDefinition(className);
-    const classIndex = _.findIndex(this.dumpLines, it => _.includes(it, classDefinition));
-    console.log(`Found class ${className} in line ${classIndex + 1}`)
-    return classIndex;
+    const __notFound = () => { 
+      throwError(`Class ${className} not found in dump.cs`); 
+    };
+    try {
+      const classDefinition = this._classDefinition(className);
+      const classIndex = _.findIndex(this.dumpLines, it => _.includes(it, classDefinition));
+      if(classIndex == -1) __notFound()
+      console.log(`Found class ${className} in line ${classIndex + 1}`)
+      return classIndex;
+    } catch (e) {
+      __notFound()
+    }
   }
 
   _findFieldInClass(className, field) {
@@ -81,6 +106,9 @@ module.exports = class DumpReader {
   _findInClass(className, search) {
     const classLines = this._classLines(className);
     const index = _.findIndex(classLines, it => _.includes(it, search));
+    if(index == -1) {
+      throwError(`${search} not found in ${className}`); 
+    }
     return { index, line: classLines[index], classLines };
   }
 
