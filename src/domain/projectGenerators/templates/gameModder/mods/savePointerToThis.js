@@ -1,13 +1,13 @@
-const buildHook = require("./buildHook");
+const { buildHook, hookDataProperty } = require("./hookUtils");
 
 const savePointerToThis = (options, mod) => {
     const { className, name, rva } = options;
-    const hookDataProperty = `${className}_${name}_this`;
+    const property = hookDataProperty(options);;
     const hackedBody = () => `uintptr_t ${name}This = (uintptr_t)thisReference;
-    if ((*myHookedData).${hookDataProperty} != thisReference) 
+    if ((*myHookedData).${property} != thisReference) 
     {
-        printf("Reassigning ${name}This from %x to %x\\n", (*myHookedData).${hookDataProperty}, thisReference);
-        (*myHookedData).${hookDataProperty} = thisReference;
+        printf("Reassigning ${property} from %x to %x\\n", (*myHookedData).${property}, thisReference);
+        (*myHookedData).${property} = thisReference;
     }
     return original${name}(thisReference);`;
 

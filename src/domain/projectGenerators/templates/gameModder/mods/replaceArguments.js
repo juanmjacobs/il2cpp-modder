@@ -1,4 +1,4 @@
-const buildHook = require("./buildHook");
+const { buildHook } = require("./hookUtils");
 
 const replaceArguments = (options, mod) => {
     const { name } = options;

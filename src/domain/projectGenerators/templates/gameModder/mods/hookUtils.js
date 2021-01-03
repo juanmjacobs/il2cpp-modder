@@ -31,5 +31,6 @@ ${cppReturnType} hacked${name}(${allCppParameters})
 `;
 }
 
+const hookDataProperty = ({ className, name }) => `${className}_${name}_this`;
 
-module.exports = buildHook;
+module.exports = { buildHook, hookDataProperty };

@@ -1,4 +1,4 @@
-const buildHook = require("./buildHook");
+const { buildHook } = require("./hookUtils");
 
 const fixedReturnValue = (options, mod) => {
     const { name } = options;
