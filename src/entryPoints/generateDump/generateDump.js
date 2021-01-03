@@ -27,8 +27,31 @@ const fileExistsOrPrompt = (gameName, filePath) => {
   })
 }
 
-const generateRules = gameName => { 
+const generateRules = (gamePath, gameName, dumpPath) => { 
   console.log("Generating rules.js!");
+  const __escapePath = aPath => aPath.replace(/\\/g,"\\\\");
+  const rulesContent = `module.exports = {
+  game: {
+    path: "${__escapePath(gamePath)}",
+    exeName: "${gameName}"
+  },
+  dump: { 
+    path: "${__escapePath(dumpPath)}",
+  },
+  hooks: {
+    methods: [{ 
+      className: "SomeClass",
+      name: "SomeMethod",
+      trampolineHookBytes: 6,
+      mods: [{ 
+        type: "modType",
+        args: "modArgs"
+      }]
+    }]
+  },
+  output: "output" //optional
+}`
+  return fs.writeFileAsync("rules.js", rulesContent);
 }
 
 const il2CppDumper = (gameName, { gameAssemblyDllPath, globalMetadataDatPath }) => {
@@ -50,18 +73,22 @@ const il2CppDumper = (gameName, { gameAssemblyDllPath, globalMetadataDatPath }) 
     return promptChooseFileDialog()
     .then(it => `"${it.trim()}"`)
     .tap(execDumper)
-    .catch(e => {})
   })
-  .finally(() => console.log(`Done! Check ${dumperOutput} for the results`))
+  .catch(e => {})
+  .thenReturn(path.join(dumperOutput, "dump.cs"))
+  .finally(() => console.log(`Done! Check ${dumperOutput} for the results`));
 }
 
 module.exports = () => {
   console.log("Will try to generate dump.cs using Il2CppDumper!")
   const $gameFolder = process.argv[3] ? Promise.resolve(process.argv[3]) : promptChooseFolderDialog();
-  let gameName;
+  let gameName, gameFolder;
   return $gameFolder
   .tap(folder => console.log("Game located at:", folder))
-  .tap(folder => { gameName = _.last(folder.split(path.sep)) })
+  .tap(folder => { 
+    gameFolder = folder;
+    gameName = _.last(folder.split(path.sep));
+  })
   .tap(() => console.log('Game name', gameName))
   .then(folder => {
     const gameAssemblyDll = path.join(folder, "GameAssembly.dll"); 
@@ -72,6 +99,6 @@ module.exports = () => {
     })
   })
   .tap(filePaths => console.log('Will use the following paths for Il2CppDumper', filePaths))
-  .tap(filePaths => il2CppDumper(gameName, filePaths))
-  .tap(() => generateRules(gameName))
+  .then(filePaths => il2CppDumper(gameName, filePaths))
+  .tap(dumpPath => generateRules(gameFolder, gameName, dumpPath))
 }
