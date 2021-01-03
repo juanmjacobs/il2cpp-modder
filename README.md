@@ -8,8 +8,8 @@ Generate DLL injection templates for modding il2cpp games.
 - Run the template generator `node src/index.js "./path/to/rules.js"`
 - Get your output files ready to compile with the tool of your choice! (I used visual studio)
 	- `injector.cpp`: Source for a simple c++ console app project that will inject our DLL in the game executable (`exe` in rules.js). 
-		- Always run as administrator!
-		- If using vs, set string to multibyte
+		- Always run as administrator! (properties -> Linker -> Manifest File -> UAC Execution Level -> requireAdministrator)
+		- If using vs, set string to multibyte (properties -> Advanced -> Character Set -> Use Multi-Byte Character Set)
 	- `gameModder`: Sources for a c++ DLL project with the mods you want!
 - Compile the output files to get an `injector.exe` and a `gameModder.dll`
 - Run the game as usual
