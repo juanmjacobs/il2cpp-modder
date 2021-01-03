@@ -4,7 +4,7 @@ module.exports = {
     exeName: "Among Us"
   },
   dump: { 
-    path: "Among_Us-il2cppdumper-output\\dump.cs",
+    path: "C:\\Users\\juan\\producteca\\il2cpp-modder\\Among_Us-il2cppdumper-output\\dump.cs",
   },
   hooks: {
     methods: [{ 

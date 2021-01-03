@@ -64,10 +64,16 @@ module.exports = class DumpReader {
   }
 
   _findClassIndex(className) {
-    const classDefinition = this._classDefinition(className);
-    const classIndex = _.findIndex(this.dumpLines, it => _.includes(it, classDefinition));
-    console.log(`Found class ${className} in line ${classIndex + 1}`)
-    return classIndex;
+    const __notFound = () => { throw new Error(`Class ${className} not found in dump.cs`) };
+    try {
+      const classDefinition = this._classDefinition(className);
+      const classIndex = _.findIndex(this.dumpLines, it => _.includes(it, classDefinition));
+      if(classIndex == -1) __notFound()
+      console.log(`Found class ${className} in line ${classIndex + 1}`)
+      return classIndex;
+    } catch (e) {
+      __notFound()
+    }
   }
 
   _findFieldInClass(className, field) {
@@ -81,6 +87,7 @@ module.exports = class DumpReader {
   _findInClass(className, search) {
     const classLines = this._classLines(className);
     const index = _.findIndex(classLines, it => _.includes(it, search));
+    if(index == -1) throw new Error(`${search} not found in ${className}`);
     return { index, line: classLines[index], classLines };
   }
 
