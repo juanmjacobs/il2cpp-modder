@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const { pathMemoryHackHooks, hookDataThis, hookDataPath } = require("./mods/hookUtils");
+const { pathMemoryHackHooks, hookDataThis, hookDataPath, pathFinalType } = require("./mods/hookUtils");
 
 const _variableName = sentence => sentence.split("=")[0].split(" ")[1].trim();
 const _pathName = ({ name, path }) => name || `${path.entryClass}.${path}`;
@@ -31,15 +31,28 @@ const _availableCommand = (hook, path, i) => `${i+1}) Change ${_pathName(path)}`
 const _commandCase = (hook, path, i) => {
     const name = _pathName(path);    
     const property = hookDataPath(hook, path.fields);
-    const target = `*(populatedData.${property})`;
+    const type = pathFinalType(path);
+    const scanfTemplate = {
+        float: "%f",
+        int: "%d",
+        string: "%s"
+    }[type] || "%d";
+
+    const hookedPointer = `populatedData.${property}`;
+    const target = `*(${hookedPointer})`;
     return `
                 case ${i + 1}: // Change ${name}
                 {
+                    if(!${hookedPointer}) 
+                    {
+                        printf("${name} not hooked yet!");
+                        break;
+                    }
                     printf("Your current ${name} is: %f\\n", ${target});
-                    int newValue = 0;
+                    ${type} newValue;
                     printf("Enter new ${name}: ");
-                    scanf_s("%d", &newValue);
-                    ${target} = (float)newValue;
+                    scanf_s("${scanfTemplate}", &newValue);
+                    ${target} = newValue;
                     break;
                 }`
 }

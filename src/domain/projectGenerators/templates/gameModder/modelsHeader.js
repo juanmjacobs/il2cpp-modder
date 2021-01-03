@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const { hookDataThis, hookDataPath, pathMemoryHackHooks } = require("./mods/hookUtils");
+const { hookDataThis, hookDataPath, pathMemoryHackHooks, pathFinalType } = require("./mods/hookUtils");
 
 const savedThisPointers = hooks => hooks
   .map(hookDataThis)
@@ -8,7 +8,7 @@ const savedThisPointers = hooks => hooks
 
 const savedPaths = hooks => _(hooks)
   .flatMap(hook => hook.paths.map(({ fields }) => {
-    const fieldType = `${_.last(fields).type}*`;
+    const fieldType = `${pathFinalType({ fields })}*`;
     const fieldName = hookDataPath(hook, fields);
     return `${fieldType} ${fieldName};`;
   }))
