@@ -16,6 +16,7 @@ const _traversePath = (hook, path) => {
         indirectionSentences.push(indirectionSentence);
     })
     return `
+    //Traverse ${path.entryClass}.${path.path}
     if(${hookedInitialPointer}) {
         ${indirectionSentences.join("\n\t\t")}
         (*hookedData).${fieldName} = ${_variableName(_.last(indirectionSentences))};
