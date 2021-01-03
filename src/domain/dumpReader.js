@@ -12,11 +12,10 @@ module.exports = class DumpReader {
     _.assign(this, it);
     this.dumpLines = this.dump.split("\n");
     this.methodInfo = this.methodInfo.bind(this);
-    this.pathInfo = this.pathInfo.bind(this);
   }
 
   methodInfo(options) {
-    const { className, name } = options;
+    const { className, name, mods } = options;
     const classIndex = this._findClassIndex(className);
     const { index, line, classLines } = this._findMethodInClass(className, name);
     const relativeRvaIndex = index - 1;
@@ -33,10 +32,15 @@ module.exports = class DumpReader {
     .filter(it => it.type && it.name);
     
     console.log(`Found method ${line} in line ${classIndex + index + 1}. RVA: ${rva}`);
-    return { ...options, methodIndex: index, rva, classIndex, relativeRvaIndex, parameters, returnType };
+    const paths = _.some(mods, { type: "savePointerToThis" }) ? this._paths(options) : []; //TODO: EXTRACT LOGIC modelsHeader.h
+    return { ...options, methodIndex: index, rva, classIndex, relativeRvaIndex, parameters, returnType, paths };
   }
 
-  pathInfo(options) {
+  _paths({ className, mods: [ { args: { paths }  } ] }) {
+    return paths.map(({ path }) => this._pathInfo({ entryClass: className, path }));
+  }
+
+  _pathInfo(options) {
     const { entryClass, path } = options;
     const fieldNames = path.split(".");
     const fields = [];

@@ -14,6 +14,13 @@ module.exports = {
       trampolineHookBytes: 6,
       mods: [{ //See Mod Types
         type: "savePointerToThis",
+        args: { 
+          paths: [{ 
+            name: "Player speed",
+            path: "MyPhysics.Speed",
+            //mode: "automatic: 90" TODO: while(true) speed = 90
+          }]
+        }
       }]
     }, { 
       className: "MLPJGKEACMM",
@@ -23,13 +30,6 @@ module.exports = {
         type: "replaceArguments",
         args: ["JECMPCICNEB", "0.0f"] 
       }]
-    }],
-    "paths": [{ 
-      name: "Player speed",
-      entryPointer: "FFGALNAPKCD.GetTruePosition.pointer1",
-      entryClass: "FFGALNAPKCD",
-      path: "MyPhysics.Speed",
-      //mode: "automatic: 90" TODO: while(true) speed = 90
     }]
   },
 }

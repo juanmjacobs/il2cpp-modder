@@ -14,8 +14,7 @@ const gameModderGenerator = new ProjectGenerators.GameModderDll(rules);
 DumpReader.load(rules)
 .then(dumpReader => {
   return Promise.props({
-    methodHooks: Promise.map(rules.hooks.methods, dumpReader.methodInfo),
-    pathHooks: Promise.map(rules.hooks.paths, dumpReader.pathInfo)
+    methodHooks: Promise.map(rules.hooks.methods, dumpReader.methodInfo)
   }) 
 })
 .tap(it => dllInjectorGenerator.generate(it))

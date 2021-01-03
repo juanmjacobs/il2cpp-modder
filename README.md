@@ -54,12 +54,6 @@ module.exports = {
 				type: "aModType", 
 				args: "modTypeArguments",
 			}]
-		}],
-		"paths": [{ //Use this paths for memory hacking!
-			name: "A descriptive name for the path", //Ex "Player speed"
-			entryPath: "path.to.savedPointer",
-			entryClass: "InitialClass", //Class starting the chain
-			path: "MyPhysics.Speed"
 		}]
 	},
 }
@@ -74,13 +68,20 @@ module.exports = {
  	- Description: Call original method with replaced arguments. (ex, always call setter with true, false, 0, etc)
  	- args: the replaced arguments (Array) (ex `["firstArgument", "0f", "true"]`)
 
-- savePointerToThis:
-  - Description: save the reference to the parameters in the [HookedData](#hooked-data) struct. Useful for memory hacks!
-  - args: No args required. (ex `SomeMethod(void* player, float amount)`, will save the `player` reference in `hookedData.SomeMethodThis` as an `uintptr_t`)
-
 - replaceImplementation: 
 	- Description: Just replace the whole thing
 	- args: the new c++ implementation (String) (ex `"return theOriginalParameter + 10;"`)
+
+- savePointerToThis:
+  - Description: save the reference to the parameters in the [HookedData](#hooked-data) struct. Useful for memory hacks!
+  - args: An array of paths to memory hack!
+  ```
+    paths: [{ 
+      name: "Player speed",
+      path: "MyPhysics.Speed",
+      //automatic: " 90" TODO: while(true) player.MyPhysics.speed = 90;
+    }]
+  ```
 
 ## Trampoline hook bytes
 [WTF is a trampoline hook?](https://stackoverflow.com/a/9336549)
