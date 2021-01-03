@@ -15,62 +15,54 @@ const parameterType = type => {
     return type;
 }
 
-const baseHook = ({ name, rva, parameters }) => {
+const buildHook = ({ name, rva, parameters }, hackedBody) => {
     const signatureParameters = !_.isEmpty(parameters)? parameters.map(parameter => `${parameterType(parameter.type)} ${parameter.name}`) : [];
     const signature = ["void* thisReference"].concat(signatureParameters).join(", ");
     return `//--------${name} hook------------
 typedef void* (*t${name})(${signature});
 uintptr_t ${name}RVA = ${rva};
 t${name} ${name} = (t${name})(assemblyAddress + ${name}RVA);
-t${name} original${name};`;
+t${name} original${name};
+void* hacked${name}(${signature}) 
+{
+    ${hackedBody()}
+}
+`;
 }
 
 const savePointerToThis = (options, mod) => {
     const { className, name, rva } = options;
     const hookDataProperty = `${className}_${name}_this`;
-    const definition =  `${baseHook(options)}
-
-void* hacked${name}(void* thisReference)
-{
-    uintptr_t ${name}This = (uintptr_t)thisReference;
+    const hackedBody = () => `uintptr_t ${name}This = (uintptr_t)thisReference;
     if ((*myHookedData).${hookDataProperty} != thisReference) 
     {
         printf("Reassigning ${name}This from %x to %x\\n", (*myHookedData).${hookDataProperty}, thisReference);
         (*myHookedData).${hookDataProperty} = thisReference;
     }
-    return original${name}(thisReference);
-}`;
+    return original${name}(thisReference);`;
+
+    const definition =  buildHook(options, hackedBody)
     return definition;
 }
 
 const replaceArguments = (options, mod) => {
     const { name } = options;
-    const definition =  `${baseHook(options)}
-    
-void* hacked${name}(void* thisReference)
-{
-    return original${name}(thisReference, ${mod.args.join(", ")});
-}`;
+    const hackedBody = () => `return original${name}(thisReference, ${mod.args.join(", ")});`
+    const definition =  buildHook(options, hackedBody);
     return definition;
 }
+
 const fixedReturnValue = (options, mod) => {
     const { name } = options;
-    const definition =  `${baseHook(options)}
-    
-${mod.args.type} hacked${name}(void* thisReference)
-{
-    return ${mod.args.value};
-}`;
+    const hackedBody = () => `return ${mod.args.value};`;
+    const definition =  buildHook(options, hackedBody);
     return definition;
 }
+
 const replaceImplementation = (options, mod) => {
     const { name } = options;
-    const definition =  `${baseHook(options)}
-    
-${mod.args.type} hacked${name}(void* thisReference)
-{
-    ${mod.args};
-}`;
+    const hackedBody = mod.args;
+    const definition = buildHook(options, args);
     return definition;
 }
 
