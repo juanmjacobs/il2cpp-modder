@@ -27,7 +27,7 @@ module.exports = class DumpReader {
     const relativeRvaIndex = index - 1;
     const rva = classLines[relativeRvaIndex].split(":")[1].split(" ")[1].trim();
     const methodParts = line.split("(");
-    const returnType = methodParts[0].split(" ").map(it => it.trim())[1];
+    const returnType = methodParts[0].split(" ").map(it => it.trim()).filter(it => !_(["virtual", "override", "async"]).includes(it))[1];
     
     const parameters = methodParts[1].split(")")[0].split(",")
     .map(it => it.trim())
