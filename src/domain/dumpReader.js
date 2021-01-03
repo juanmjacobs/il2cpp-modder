@@ -3,6 +3,11 @@ const _ = require("lodash");
 const Promise = require("bluebird");
 const { isPathMemoryHack } = require("./projectGenerators/templates/gameModder/mods/hookUtils");
 
+const throwError = message => {
+  console.log("\n\n", "[ERROR]", message, "\n\n");
+  throw new Error(message);
+}
+
 module.exports = class DumpReader {
   static load({ dump }) {
     return fs.readFileAsync(dump.path)
@@ -37,8 +42,20 @@ module.exports = class DumpReader {
     return { ...options, methodIndex: index, rva, classIndex, relativeRvaIndex, parameters, returnType, paths };
   }
 
-  _paths({ className, mods: [ { args: { paths }  } ] }) {
-    return paths.map((path) => this._pathInfo({ entryClass: className, ...path }));
+  _paths({ className, name, mods: [ { args: { paths }  } ] }) {
+    const validPaths = paths.map((path) => {
+      try {
+        return this._pathInfo({ entryClass: className, ...path })
+      } catch(e) {
+        return null;
+      }
+    })
+    .filter(it => it);
+
+    if(_.isEmpty(validPaths)) {
+      throwError(`No valid paths for mod ${className}.${name}`);
+    }
+    return validPaths;
   }
 
   _pathInfo(options) {
@@ -65,9 +82,7 @@ module.exports = class DumpReader {
 
   _findClassIndex(className) {
     const __notFound = () => { 
-      const errorMessage = `Class ${className} not found in dump.cs`;
-      console.log(errorMessage);
-      throw new Error(errorMessage); 
+      throwError(`Class ${className} not found in dump.cs`); 
     };
     try {
       const classDefinition = this._classDefinition(className);
@@ -92,9 +107,7 @@ module.exports = class DumpReader {
     const classLines = this._classLines(className);
     const index = _.findIndex(classLines, it => _.includes(it, search));
     if(index == -1) {
-      const errorMessage = `${search} not found in ${className}`;
-      console.log(`${search} not found in ${className}`);
-      throw new Error(errorMessage);
+      throwError(`${search} not found in ${className}`); 
     }
     return { index, line: classLines[index], classLines };
   }

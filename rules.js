@@ -7,13 +7,22 @@ module.exports = {
     path: "C:\\Users\\juan\\producteca\\il2cpp-modder\\Among_Us-il2cppdumper-output\\dump.cs",
   },
   hooks: {
-    methods: [{ 
-      className: "SomeClass",
-      name: "SomeMethod",
+    methods: [{
+      className: "FFGALNAPKCD",
+      name: "GetTruePosition",
       trampolineHookBytes: 6,
-      mods: [{ 
-        type: "modType",
-        args: "modArgs"
+      mods: [{ //See Mod Types
+        type: "pathMemoryHack",
+        args: { 
+          paths: [{ 
+            name: "Player speed",
+            path: "MyPhysics.Speed"
+          },{ 
+            name: "Player is moveable",
+            path: "moveable",
+            value: "true"
+          }]
+        }
       }]
     }]
   },
