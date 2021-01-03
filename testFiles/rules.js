@@ -21,7 +21,7 @@ module.exports = {
       trampolineHookBytes: 11,
       mods: [{ 
         type: "replaceArguments",
-        args: ["0f", "0f"] 
+        args: ["JECMPCICNEB", "0.0f"] 
       }]
     }],
     "paths": [{ 
