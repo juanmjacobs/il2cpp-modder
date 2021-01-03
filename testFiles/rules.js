@@ -33,14 +33,6 @@ module.exports = {
         type: "replaceArguments",
         args: ["JECMPCICNEB", "0.0f"] 
       }]
-    }, { 
-      className: "SafeHandleZeroOrMinusOneIsInvalid",
-      name: "get_IsInvalid",
-      trampolineHookBytes: 11,
-      mods: [{ 
-        type: "fixedReturnValue",
-        args: "true" 
-      }]
     }]
   },
 }
