@@ -41,6 +41,8 @@ You should now have all your dll and dll injection code in your defined output f
 You can compile the files with the tool of your choice. Here are the steps for Visual Studio!
   - To get the `injector.exe`
     - Create a new C++ console project and name it `injector`.
+    - Make it always run as administrator! (properties -> Linker -> Manifest File -> UAC Execution Level -> requireAdministrator)
+    - Set strings to multibyte (properties -> Advanced -> Character Set -> Use Multi-Byte Character Set)
     - Add the `output/injector` files to the project. 
     - Compile it and the `injector.exe` will be in the `Debug` folder.
   - To get the `gameModder.dll`
