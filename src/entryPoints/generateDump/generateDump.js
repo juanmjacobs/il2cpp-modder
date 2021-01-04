@@ -3,7 +3,10 @@ const _ = require("lodash");
 const path = require("path");
 const Promise = require("bluebird");
 const { exec } = require("child_process");
-const execAsync = Promise.promisify(exec);
+const execAsync = command => {
+  console.log("Executing:\n "+ command+"\n");
+  return Promise.promisify(exec)(command);
+};
 Promise.promisifyAll(fs);
 
 const promptChooseFolderDialog = () => execAsync(path.join(__dirname, "chooseFolder.bat"));
@@ -24,6 +27,29 @@ const fileExistsOrPrompt = (gameName, filePath) => {
   })
 }
 
+const il2CppDumper = ({ gameAssemblyDllPath, globalMetadataDatPath }) => {
+  console.log("Trying to execute Il2CppDumper.exe in PATH");
+  const dumperOutput = process.argv[4] || "il2cppdumper-output";
+  const execDumper =  il2CppDumperExe => {
+    if(!il2CppDumperExe) { return Promise.reject("No Il2CppDumper executable supplied!"); }
+    console.log("Creating output directory", dumperOutput);
+    return execAsync(`rm -rf ${dumperOutput}`).reflect()
+    .then(() => execAsync("mkdir " + dumperOutput).reflect())
+    .then(inspection => console.log(`output directory ${dumperOutput} ${inspection.isFulfilled()? "" :" not "}created`))
+    .then(() => execAsync(`${il2CppDumperExe} "${gameAssemblyDllPath}" "${globalMetadataDatPath}" "il2cppdumper-output"`))
+    .tap(it => console.log(`\nIl2CppDumper output: \n${it}\n`));
+    
+  };
+  return execDumper("Il2CppDumper.exe")
+  .catch(e => /not recognized|no se reconoce/gi.test(e.toString()), () => {
+    console.log('Il2CppDumper.exe not found in PATH! Please select your Il2CppDumper.exe');
+    return promptChooseFileDialog();
+  })
+  .tap(execDumper)
+  .catch(e => {})
+  .finally(() => console.log(`Done! Check ${dumperOutput} for the results`))
+}
+
 module.exports = () => {
   console.log("Will try to generate dump.cs using Il2CppDumper!")
   const $gameFolder = process.argv[3] ? Promise.resolve(process.argv[3]) : promptChooseFolderDialog();
@@ -37,6 +63,7 @@ module.exports = () => {
       gameAssemblyDllPath: fileExistsOrPrompt(gameName, gameAssemblyDll),
       globalMetadataDatPath: fileExistsOrPrompt(gameName, globalMetadataDat) 
     })
-    .tap(filePaths => console.log('Will use the following paths for Il2CppDumper', filePaths))
   })
+  .tap(filePaths => console.log('Will use the following paths for Il2CppDumper', filePaths))
+  .tap(il2CppDumper)
 }
