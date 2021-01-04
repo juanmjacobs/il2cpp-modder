@@ -9,10 +9,10 @@ You know that you have to override some method, replace the value of some field 
 Well this is the project for you! il2cpp-modder lets you describre **what** to do and it will generate all the code to do it. That's it, **you don't have to program at all!**
 
 # Examples
-- [Make a method return a fixed value](https://github.com/juanmjacobs/il2cpp-modder/tree/main/examples/modExamples.md#fixed-return-value). Cool usages: Make a validation always `return true;`, a getter always `return 0;` or a really high number or just skip a void function replacing it for a `return;`
-- [Replace the arguments for a method call](https://github.com/juanmjacobs/il2cpp-modder/tree/main/examples/modExamples.md#replace-arguments) Cool usages: Make a setter always set the same value (original `setCooldown(aVariable)` --> hooked `setCooldown(0)`)
-- [Set the value of an object field](https://github.com/juanmjacobs/il2cpp-modder/tree/main/examples/modExamples.md#path-memory-hack). Cool usages: keep your health in always in 100 and your money always in 9999999.
-- [Replace the implementation of a method](https://github.com/juanmjacobs/il2cpp-modder/tree/main/examples/modExamples.md#replace-implementation). If the other mods just don't cut it, you can just replace the whole thing for something different that suits your needs! The sky is the limit. You do need to program C++ for this though...
+- [Make a method return a fixed value](https://github.com/juanmjacobs/il2cpp-modder/tree/main/doc/examples.md#fixed-return-value). Cool usages: Make a validation always `return true;`, a getter always `return 0;` or a really high number or just skip a void function replacing it for a `return;`
+- [Replace the arguments for a method call](https://github.com/juanmjacobs/il2cpp-modder/tree/main/doc/examples.md#replace-arguments) Cool usages: Make a setter always set the same value (original `setCooldown(aVariable)` --> hooked `setCooldown(0)`)
+- [Set the value of an object field](https://github.com/juanmjacobs/il2cpp-modder/tree/main/doc/examples.md#path-memory-hack). Cool usages: keep your health in always in 100 and your money always in 9999999.
+- [Replace the implementation of a method](https://github.com/juanmjacobs/il2cpp-modder/tree/main/doc/examples.md#replace-implementation). If the other mods just don't cut it, you can just replace the whole thing for something different that suits your needs! The sky is the limit. You do need to program C++ for this though...
 
 # Requirements
 - NodeJS
