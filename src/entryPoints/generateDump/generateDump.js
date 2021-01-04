@@ -8,11 +8,20 @@ Promise.promisifyAll(fs);
 
 const promptChooseFolderDialog = () => execAsync(path.join(__dirname, "chooseFolder.bat"));
 const promptChooseFileDialog = () => execAsync(path.join(__dirname, "chooseFile.bat"));
+const lastPart = aPath => _.last(aPath.split(path.sep));
 
-const fileExistsOrPrompt = (filePath) => {
+const fileExistsOrPrompt = (gameName, filePath) => {
   console.log("Searching for", filePath);
-  return fs.existsAsync(filePath)
-  .then(exists => exists? filePath : promptChooseFileDialog())
+  const fileName = lastPart(filePath);
+  return Promise.try(() => fs.existsSync(filePath))
+  .then(exists => {
+    if(exists)  {
+      console.log(filePath, "found!")
+      return filePath;
+    }
+    console.log(filePath, `not found, please select a the ${fileName} for ${gameName}!`);
+    return promptChooseFileDialog();
+  })
 }
 
 module.exports = () => {
@@ -25,8 +34,8 @@ module.exports = () => {
     const gameAssemblyDll = path.join(folder, "GameAssembly.dll"); 
     const globalMetadataDat = path.join(folder, `${gameName}_Data`, "il2cpp_data", "Metadata", "global-metadata.dat"); 
     return Promise.props({
-      gameAssemblyDllPath: fileExistsOrPrompt(gameAssemblyDll),
-      globalMetadataDatPath: fileExistsOrPrompt(globalMetadataDat) 
+      gameAssemblyDllPath: fileExistsOrPrompt(gameName, gameAssemblyDll),
+      globalMetadataDatPath: fileExistsOrPrompt(gameName, globalMetadataDat) 
     })
     .tap(filePaths => console.log('Will use the following paths for Il2CppDumper', filePaths))
   })
