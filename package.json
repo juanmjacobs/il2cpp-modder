@@ -2,7 +2,7 @@
   "name": "il2cpp-modder",
   "version": "1.0.0",
   "description": "Generate CPP source for modding il2cpp games via dll injection",
-  "main": "index.js",
+  "main": "il2cpp-modder",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,5 +26,8 @@
     "bluebird": "^3.7.2",
     "lodash": "^4.17.20",
     "mkdirp": "^1.0.4"
+  },
+  "bin": {
+    "il2cpp-modder": "index.js"
   }
 }
