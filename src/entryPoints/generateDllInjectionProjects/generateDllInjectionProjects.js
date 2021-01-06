@@ -13,7 +13,10 @@ module.exports = generateDllInjectionProjects = (rulesPath) => {
 
   const dllInjectorGenerator = new ProjectGenerators.DllInjector(rules);
   const gameModderGenerator = new ProjectGenerators.GameModderDll(rules);
-
+  if(!rules.game || !rules.dump || !rules.hooks || !rules.hooks.methods) {
+    console.log("Please supply a valid rules file. Check the docs if you need to!")
+    return;
+  }
   DumpReader.load(rules)
   .then(dumpReader => {
     return Promise.props({
