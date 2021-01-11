@@ -9,8 +9,8 @@ const execAsync = command => {
 };
 Promise.promisifyAll(fs);
 
-const promptChooseFolderDialog = () => execAsync(path.join(__dirname, "chooseFolder.bat"));
-const promptChooseFileDialog = () => execAsync(path.join(__dirname, "chooseFile.bat"));
+const promptChooseFolderDialog = () => execAsync(path.join(__dirname, "chooseFolder.bat")).then(it => it.trim());
+const promptChooseFileDialog = () => execAsync(path.join(__dirname, "chooseFile.bat")).then(it => it.trim());
 const lastPart = aPath => _.last(aPath.split(path.sep));
 
 const fileExistsOrPrompt = (gameName, filePath) => {
