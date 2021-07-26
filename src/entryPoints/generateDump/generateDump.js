@@ -4,6 +4,9 @@ const path = require("path");
 const Promise = require("bluebird");
 const { exec } = require("child_process");
 const execAsync = command => {
+  if(!command.startsWith("\"") && !command.endsWith("\"")) {
+    command = "\"" + command + "\"";
+  }
   console.log("Executing:\n "+ command+"\n");
   return Promise.promisify(exec)(command);
 };
